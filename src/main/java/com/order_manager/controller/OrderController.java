@@ -28,7 +28,7 @@ public class OrderController {
     public ResponseEntity<OrderResponse> createOrder(@AuthenticationPrincipal UserDetails userDetails,
                                                      @RequestBody OrderRequest request) {
         OrderResponse order = orderService.createOrder(
-                userDetails.getUsername(), request.getListOfProductId(), request.getQuantity());
+                userDetails.getUsername(), request.listOfProductId(), request.quantity());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }

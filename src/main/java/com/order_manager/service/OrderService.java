@@ -45,6 +45,7 @@ public class OrderService {
         return mapToResponse(orderRepository.save(order));
     }
 
+    @Transactional
     public List<OrderResponse> getOrdersForUser(String username) {
         return orderRepository.findByUserUsername(username)
                 .stream()

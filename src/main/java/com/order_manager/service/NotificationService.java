@@ -11,7 +11,7 @@ public class NotificationService {
 
     @Async
     public void sendOrderStatusChangeNotification(String email, Long orderId, OrderStatus status) {
-        log.info("Dispatch notification to {} about status of order #{}: {}", email, orderId, status);
+        log.info("Dispatch notification to {} about changing status of order #{}: {}", email, orderId, status);
 
         try {
             Thread.sleep(5000);

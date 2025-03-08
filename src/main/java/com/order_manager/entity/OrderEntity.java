@@ -31,8 +31,7 @@ public class OrderEntity {
     @Builder.Default
     private List<ProductEntity> products = new ArrayList<>();
 
-    @Builder.Default
-    private int quantity = 1;
+    private int quantity;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

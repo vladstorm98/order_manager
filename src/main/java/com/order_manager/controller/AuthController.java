@@ -7,8 +7,6 @@ import com.order_manager.security.JwtTokenProvider;
 import com.order_manager.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,7 +24,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public void register(@RequestBody @Valid AuthRequest request) {
-        authService.registerUser(request.getUsername(), request.getPassword(), UserRole.USER);;
+        authService.registerUser(request.getUsername(), request.getPassword(), UserRole.USER);
     }
 
     @PostMapping("/login")

@@ -3,6 +3,7 @@ package com.order_manager.service;
 import com.order_manager.dto.ProductRequest;
 import com.order_manager.dto.ProductResponse;
 import com.order_manager.entity.ProductEntity;
+import com.order_manager.exception.ProductNotFoundException;
 import com.order_manager.repository.ProductRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -40,7 +41,7 @@ public class ProductService {
 
     public ProductResponse updateProduct(long id, ProductRequest request) {
         if (productRepository.findById(id).isEmpty()) {
-            throw new EntityNotFoundException("Product not found");
+            throw new ProductNotFoundException("Product not found");
         }
 
         ProductEntity product = productRepository.findById(id).get();

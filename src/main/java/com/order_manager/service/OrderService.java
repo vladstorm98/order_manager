@@ -6,6 +6,8 @@ import com.order_manager.entity.OrderEntity;
 import com.order_manager.entity.OrderStatus;
 import com.order_manager.entity.ProductEntity;
 import com.order_manager.entity.UserEntity;
+import com.order_manager.exception.OrderNotFoundException;
+import com.order_manager.exception.UserNotFoundException;
 import com.order_manager.repository.OrderRepository;
 import com.order_manager.repository.ProductRepository;
 import com.order_manager.repository.UserRepository;
@@ -27,7 +29,7 @@ public class OrderService {
 
     public OrderResponse createOrder(String username, OrderRequest request) {
         UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         List<ProductEntity> products = productRepository.findByIdIn(request.listOfProductId());
         if (products.isEmpty()) {
@@ -55,7 +57,7 @@ public class OrderService {
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus status) {
         OrderEntity order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
         order.setStatus(status);
 
         notificationService.sendOrderStatusChangeNotification(order.getUser().getEmail(), orderId, status);

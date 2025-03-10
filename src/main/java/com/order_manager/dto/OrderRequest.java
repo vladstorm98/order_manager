@@ -1,13 +1,14 @@
 package com.order_manager.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
-@Getter
-@Setter
-public class OrderRequest {
-    private List<Long> listOfProductId;
-    private int quantity;
+public record OrderRequest (
+
+        @Schema(example = "[1, 2]")
+        List<Long> listOfProductId,
+
+        @Schema(example = "1")
+        int quantity) {
 }

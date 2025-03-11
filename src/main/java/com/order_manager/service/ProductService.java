@@ -18,6 +18,13 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    public List<ProductResponse> getAllProducts() {
+        return productRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     public ProductResponse createProduct(ProductRequest request) {
         if (productRepository.findByName(request.getName()).isPresent()) {
             throw new EntityExistsException("Product already exists");
@@ -30,13 +37,6 @@ public class ProductService {
                 .build();
 
         return mapToResponse(productRepository.save(product));
-    }
-
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
     }
 
     public ProductResponse updateProduct(long id, ProductRequest request) {

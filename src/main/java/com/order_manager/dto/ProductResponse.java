@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductResponse {
+public class ProductResponse implements ResponseDTO {
     private long id;
     private String name;
     private double price;

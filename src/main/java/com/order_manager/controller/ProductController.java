@@ -26,7 +26,7 @@ public class ProductController {
 
     @PostMapping
     @Operation(summary = "Add a new product")
-    public ProductResponse addProduct(@RequestBody ProductRequest request) {
+    public ProductResponse createProduct(@RequestBody ProductRequest request) {
         return productService.createProduct(request);
     }
 

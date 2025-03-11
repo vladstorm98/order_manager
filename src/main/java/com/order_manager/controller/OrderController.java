@@ -8,8 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -25,17 +23,15 @@ public class OrderController {
 
     @GetMapping
     @Operation(summary = "Get orders for a user")
-    public List<OrderResponse> getOrdersForUser(@AuthenticationPrincipal UserDetails userDetails) {
-        return orderService.getOrdersForUser(userDetails.getUsername());
+    public List<OrderResponse> getAllOrdersForUser(@AuthenticationPrincipal UserDetails userDetails) {
+        return orderService.getAllOrdersForUser(userDetails.getUsername());
     }
 
     @PostMapping
     @Operation(summary = "Create a new order")
-    public ResponseEntity<OrderResponse> createOrder(@AuthenticationPrincipal UserDetails userDetails,
+    public OrderResponse createOrder(@AuthenticationPrincipal UserDetails userDetails,
                                                      @RequestBody OrderRequest request) {
-        OrderResponse order = orderService.createOrder(userDetails.getUsername(), request);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(order);
+        return orderService.createOrder(userDetails.getUsername(), request);
     }
 
     @PutMapping("/{orderId}")

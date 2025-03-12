@@ -48,6 +48,14 @@ public class LoggingAspect {
         }
     }
 
+    @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allGetMethods()", returning = "response")
+    public void afterAllGetMethods(ResponseDTO response) {
+        String entityType = response.getClass().getSimpleName();
+
+        String entity = entityType.endsWith("Response") ? entityType.substring(0, entityType.length() - 8) : entityType;
+        log.info("{} was successfully retrieved", entity);
+    }
+
     @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allCreateMethods()", returning = "response")
     public void afterAllCreateMethods(ResponseDTO response) {
         String entity = getEntity(response);

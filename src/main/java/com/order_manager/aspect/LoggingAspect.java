@@ -1,4 +1,4 @@
-package com.order_manager.aspects;
+package com.order_manager.aspect;
 
 
 import com.order_manager.dto.ResponseDTO;
@@ -15,7 +15,7 @@ import java.util.List;
 @Slf4j
 public class LoggingAspect {
 
-    @Around("com.order_manager.aspects.Pointcuts.allMethods()")
+    @Around("com.order_manager.aspect.Pointcuts.allControllerMethods()")
     public Object aroundAllMethods(ProceedingJoinPoint joinPoint) throws Throwable {
         String methodName = joinPoint.getSignature().getName();
         log.info("Method {} was launched", methodName);
@@ -31,7 +31,7 @@ public class LoggingAspect {
         }
     }
 
-    @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allGetAllMethods()", returning = "response")
+    @AfterReturning(pointcut = "com.order_manager.aspect.Pointcuts.allGetAllMethods()", returning = "response")
     public void afterAllGetAllMethods(Object response) {
         if (response instanceof List<?> responseList && responseList.getFirst() instanceof ResponseDTO) {
             String entityType = responseList.stream()
@@ -46,7 +46,7 @@ public class LoggingAspect {
         }
     }
 
-    @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allGetMethods()", returning = "response")
+    @AfterReturning(pointcut = "com.order_manager.aspect.Pointcuts.allGetMethods()", returning = "response")
     public void afterAllGetMethods(ResponseDTO response) {
         String entityType = response.getClass().getSimpleName();
 
@@ -54,7 +54,7 @@ public class LoggingAspect {
         log.info("{} was successfully retrieved", entity);
     }
 
-    @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allCreateMethods()", returning = "response")
+    @AfterReturning(pointcut = "com.order_manager.aspect.Pointcuts.allCreateMethods()", returning = "response")
     public void afterAllCreateMethods(ResponseDTO response) {
         String entityType = response.getClass().getSimpleName();
 
@@ -62,7 +62,7 @@ public class LoggingAspect {
         log.info("{} was successfully created", entity);
     }
 
-    @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allUpdateMethods()", returning = "response")
+    @AfterReturning(pointcut = "com.order_manager.aspect.Pointcuts.allUpdateMethods()", returning = "response")
     public void afterAllUpdateMethods(ResponseDTO response) {
         String entityType = response.getClass().getSimpleName();
 
@@ -70,7 +70,7 @@ public class LoggingAspect {
         log.info("{} was successfully updated", entity);
     }
 
-    @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allDeleteMethods()")
+    @AfterReturning(pointcut = "com.order_manager.aspect.Pointcuts.allDeleteMethods()")
     public void afterAllDeleteMethods(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
 

@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
-public class WebClientService {
+public class UserWebClientService {
 
     private final WebClient webClient;
 

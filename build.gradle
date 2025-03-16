@@ -45,11 +45,12 @@ dependencies {
     implementation 'org.hibernate.orm:hibernate-core'
     implementation 'org.postgresql:postgresql'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
-
+    implementation 'org.mapstruct:mapstruct:1.6.3'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'  // JUnit, Mockito, AssertJ
     testImplementation 'org.mockito:mockito-core'                           // Дополнительно для Mockito

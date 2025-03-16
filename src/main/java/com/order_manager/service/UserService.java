@@ -5,6 +5,7 @@ import com.order_manager.dto.UserResponse;
 import com.order_manager.entity.UserRole;
 import com.order_manager.entity.UserEntity;
 import com.order_manager.exception.UserNotFoundException;
+import com.order_manager.mapper.UserMapper;
 import com.order_manager.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +18,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     public UserResponse getUserById(Long userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-        return toResponse(user);
+        return userMapper.toResponse(user);
     }
 
     public UserResponse createUser(UserRequest request) {
@@ -31,7 +33,7 @@ public class UserService {
 
         UserEntity user = new UserEntity(
                 request.username(), passwordEncoder.encode(request.password()), UserRole.USER);
-        return toResponse(userRepository.save(user));
+        return userMapper.toResponse(userRepository.save(user));
     }
 
     public UserResponse updateUser(long id, UserRequest request) {
@@ -41,7 +43,7 @@ public class UserService {
 
         UserEntity user = new UserEntity(
                 id, request.username(), passwordEncoder.encode(request.password()), UserRole.USER);
-        return toResponse(userRepository.save(user));
+        return userMapper.toResponse(userRepository.save(user));
     }
 
     public void deleteUser(long userId) {
@@ -50,9 +52,5 @@ public class UserService {
         }
 
         userRepository.deleteById(userId);
-    }
-
-    private UserResponse toResponse(UserEntity user) {
-        return new UserResponse(user);
     }
 }

@@ -31,14 +31,16 @@ public class ProductServiceTest {
 
     @Test
     void shouldReturnAllProducts() {
-        ProductResponse product1 = new ProductResponse(1L, "Product 1", 100);
-        ProductResponse product2 = new ProductResponse(2L, "Product 2", 200);
-        when(productClient.getAllProducts()).thenReturn(List.of(product1, product2));
+        List<ProductResponse> products = List.of(
+                new ProductResponse(1L, "Product 1", 100),
+                new ProductResponse(2L, "Product 2", 200)
+        );
+        when(productClient.getAllProducts()).thenReturn(products);
 
         List<ProductResponse> result = productService.getAllProducts();
 
-        assertEquals(2, result.size());
-        assertEquals("Product 1", result.getFirst().name());
+        assertEquals(products.size(), result.size());
+        assertEquals(products.getFirst(), result.getFirst());
         verify(productClient).getAllProducts();
     }
 

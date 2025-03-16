@@ -3,7 +3,7 @@ package com.order_manager.service;
 import com.order_manager.client.ProductClient;
 import com.order_manager.dto.ProductRequest;
 import com.order_manager.dto.ProductResponse;
-import com.order_manager.exception.ProductCreationException;
+import com.order_manager.exception.ProductExistException;
 import com.order_manager.exception.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,16 +30,18 @@ public class ProductService {
 
     public ProductResponse createProduct(ProductRequest request) {
         return Optional.ofNullable(productClient.createProduct(request))
-                    .orElseThrow(() -> new ProductCreationException("Product creation failed"));
+                    .orElseThrow(() -> new ProductExistException("Product already exists"));
     }
 
     public ProductResponse updateProduct(long id, ProductRequest request) {
         return Optional.ofNullable(productClient.updateProduct(id, request))
-                    .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
+                    .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found for update"));
     }
 
     public void deleteProduct(long id) {
-        productClient.deleteProduct(id);
+        Optional.ofNullable(productClient.getProduct(id))
+                .ifPresentOrElse(product -> productClient.deleteProduct(id), () -> {
+                    throw new ProductNotFoundException("Product with ID " + id + " not found for delete");
+                });
     }
 }
-

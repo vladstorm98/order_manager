@@ -32,14 +32,14 @@ public class OrderService {
 
     @Transactional
     public List<OrderResponse> getAllOrdersForUser(String username) {
-        return orderRepository.findByUserUsername(username)
+        return orderRepository.findByUserName(username)
                 .stream()
                 .map(orderMapper::toResponse)
                 .toList();
     }
 
     public OrderResponse createOrder(String username, OrderRequest request) {
-        UserEntity user = userRepository.findByUsername(username)
+        UserEntity user = userRepository.findByName(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         List<ProductEntity> products = productRepository.findByIdIn(request.listOfProductId());

@@ -8,7 +8,7 @@ public record UserRequest(
         @Schema(example = "vlad")
         @NotBlank
         @Size(min = 3, max = 16)
-        String username,
+        String name,
 
         @Schema(example = "1111")
         @NotBlank

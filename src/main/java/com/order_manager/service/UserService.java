@@ -27,12 +27,12 @@ public class UserService {
     }
 
     public UserResponse createUser(UserRequest request) {
-        if (userRepository.findByUsername(request.username()).isPresent()) {
-            throw new EntityExistsException("User with username " + request.username() + " already exists");
+        if (userRepository.findByName(request.name()).isPresent()) {
+            throw new EntityExistsException("User with name " + request.name() + " already exists");
         }
 
         UserEntity user = new UserEntity(
-                request.username(), passwordEncoder.encode(request.password()), UserRole.USER);
+                request.name(), passwordEncoder.encode(request.password()), UserRole.USER);
         return userMapper.toResponse(userRepository.save(user));
     }
 
@@ -42,7 +42,7 @@ public class UserService {
         }
 
         UserEntity user = new UserEntity(
-                id, request.username(), passwordEncoder.encode(request.password()), UserRole.USER);
+                id, request.name(), passwordEncoder.encode(request.password()), UserRole.USER);
         return userMapper.toResponse(userRepository.save(user));
     }
 

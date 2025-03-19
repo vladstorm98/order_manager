@@ -1,10 +1,9 @@
 package com.order_manager.controller;
 
-import com.order_manager.dto.AuthRequest;
 import com.order_manager.dto.AuthResponse;
-import com.order_manager.entity.UserRole;
+import com.order_manager.dto.UserRequest;
 import com.order_manager.security.JwtTokenProvider;
-import com.order_manager.service.AuthService;
+import com.order_manager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,25 +20,25 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/register")
     @Operation(summary = "Registration a new user")
-    public void register(@RequestBody @Valid AuthRequest request) {
-        authService.registerUser(request.getUsername(), request.getPassword(), UserRole.USER);
+    public void register(@RequestBody @Valid UserRequest request) {
+        userService.createUser(request);
     }
 
     @PostMapping("/login")
     @Operation(summary = "User authorization")
-    public AuthResponse login(@RequestBody AuthRequest request) {
+    public AuthResponse login(@RequestBody UserRequest request) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+                new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String token = jwtTokenProvider.createToken(request.getUsername());
+        String token = jwtTokenProvider.createToken(request.username());
 
         return new AuthResponse(token);
     }

@@ -8,6 +8,7 @@ import com.order_manager.entity.ProductEntity;
 import com.order_manager.entity.UserEntity;
 import com.order_manager.exception.OrderNotFoundException;
 import com.order_manager.exception.UserNotFoundException;
+import com.order_manager.mapper.OrderMapper;
 import com.order_manager.repository.OrderRepository;
 import com.order_manager.repository.ProductRepository;
 import com.order_manager.repository.UserRepository;
@@ -27,7 +28,15 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final NotificationService notificationService;
+    private final OrderMapper orderMapper;
 
+    @Transactional
+    public List<OrderResponse> getAllOrdersForUser(String username) {
+        return orderRepository.findByUserUsername(username)
+                .stream()
+                .map(orderMapper::toResponse)
+                .toList();
+    }
 
     public OrderResponse createOrder(String username, OrderRequest request) {
         UserEntity user = userRepository.findByUsername(username)
@@ -45,15 +54,7 @@ public class OrderService {
                 .status(OrderStatus.PENDING)
                 .build();
 
-        return mapToResponse(orderRepository.save(order));
-    }
-
-    @Transactional
-    public List<OrderResponse> getOrdersForUser(String username) {
-        return orderRepository.findByUserUsername(username)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        return orderMapper.toResponse(orderRepository.save(order));
     }
 
     @Transactional
@@ -64,7 +65,7 @@ public class OrderService {
 
         notificationService.sendOrderStatusChangeNotification(order.getUser().getEmail(), orderId, status);
 
-        return mapToResponse(orderRepository.save(order));
+        return orderMapper.toResponse(orderRepository.save(order));
     }
 
     public void deleteOrder(Long orderId) {
@@ -74,9 +75,4 @@ public class OrderService {
             throw new EntityNotFoundException("Order not found");
         }
     }
-
-    private OrderResponse mapToResponse(OrderEntity order) {
-        return new OrderResponse(order);
-    }
 }
-

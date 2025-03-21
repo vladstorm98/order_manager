@@ -10,6 +10,9 @@ public class Pointcuts {
     @Pointcut("execution(* com.order_manager.controller..*.getAll*(..))")
     public void allGetAllMethods() {}
 
+    @Pointcut("execution(* com.order_manager.controller..*.get*(..)) && !execution(* com.order_manager.controller..*.getAll*(..))")
+    public void allGetMethods() {}
+
     @Pointcut("execution(* com.order_manager.controller..*.create*(..))")
     public void allCreateMethods() {}
 

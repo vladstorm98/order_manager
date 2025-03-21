@@ -1,25 +1,14 @@
 package com.order_manager.dto;
 
 import com.order_manager.entity.ProductEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class ProductResponse implements ResponseDTO {
-    private long id;
-    private String name;
-    private double price;
+public record ProductResponse(
+        long id,
+        String name,
+        double price
+) implements ResponseDTO {
 
     public ProductResponse(ProductEntity product) {
-        this.id = product.getId();
-        this.name = product.getName();
-        this.price = product.getPrice();
+        this(product.getId(), product.getName(), product.getPrice());
     }
-
 }

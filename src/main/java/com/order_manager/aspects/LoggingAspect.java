@@ -50,10 +50,15 @@ public class LoggingAspect {
 
     @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allGetMethods()", returning = "response")
     public void afterAllGetMethods(ResponseDTO response) {
-        String entityType = response.getClass().getSimpleName();
+        String entity = getEntity(response);
 
-        String entity = entityType.endsWith("Response") ? entityType.substring(0, entityType.length() - 8) : entityType;
-        log.info("{} was successfully retrieved", entity);
+        try {
+            Method idMethod = response.getClass().getMethod("id");
+            Object id = idMethod.invoke(response);
+            log.info("{} with id #{} was retrieved", entity, id);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            getWarn(entity);
+        }
     }
 
     @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allCreateMethods()", returning = "response")

@@ -1,13 +1,15 @@
 package com.order_manager.aspects;
 
-
 import com.order_manager.dto.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 @Aspect
@@ -41,32 +43,52 @@ public class LoggingAspect {
                     .getClass()
                     .getSimpleName();
 
-            String entity = entityType.substring(0, entityType.length() - 8);
+            String entity = StringUtils.removeEnd(entityType, "Response");
             log.info("{}s were successfully retrieved", entity);
         }
     }
 
     @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allCreateMethods()", returning = "response")
     public void afterAllCreateMethods(ResponseDTO response) {
-        String entityType = response.getClass().getSimpleName();
+        String entity = getEntity(response);
 
-        String entity = entityType.endsWith("Response") ? entityType.substring(0, entityType.length() - 8) : entityType;
-        log.info("{} was successfully created", entity);
+        try {
+            Method idMethod = response.getClass().getMethod("id");
+            Object id = idMethod.invoke(response);
+            log.info("{} with id #{} was created", entity, id);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            getWarn(entity);
+        }
     }
 
     @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allUpdateMethods()", returning = "response")
     public void afterAllUpdateMethods(ResponseDTO response) {
-        String entityType = response.getClass().getSimpleName();
+        String entity = getEntity(response);
 
-        String entity = entityType.endsWith("Response") ? entityType.substring(0, entityType.length() - 8) : entityType;
-        log.info("{} was successfully updated", entity);
+        try {
+            Method idMethod = response.getClass().getMethod("id");
+            Object id = idMethod.invoke(response);
+            log.info("{} with id #{} was updated", entity, id);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            getWarn(entity);
+        }
     }
 
     @AfterReturning(pointcut = "com.order_manager.aspects.Pointcuts.allDeleteMethods()")
     public void afterAllDeleteMethods(JoinPoint joinPoint) {
-        String methodName = joinPoint.getSignature().getName();
+        String entityType = joinPoint.getSignature().getName();
+        String entity = StringUtils.removeStart(entityType, "delete");
 
-        String entity = methodName.substring(6);
-        log.info("{} was successfully Deleted", entity);
+        Object id = joinPoint.getArgs()[0] instanceof Long ? joinPoint.getArgs()[0] : null;
+        log.info("{} with id #{} was deleted", entity, id);
+    }
+
+    private static String getEntity(ResponseDTO response) {
+        String entityType = response.getClass().getSimpleName();
+        return StringUtils.removeEnd(entityType, "Response");
+    }
+
+    private static void getWarn(String entity) {
+        log.warn("Failed to extract ID from {}", entity);
     }
 }

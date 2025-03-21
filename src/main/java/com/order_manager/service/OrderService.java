@@ -28,7 +28,6 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final NotificationService notificationService;
 
-    @Transactional
     public List<OrderResponse> getAllOrdersForUser(String username) {
         return orderRepository.findByUserUsername(username)
                 .stream()

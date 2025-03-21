@@ -20,13 +20,13 @@ public class ProductController {
 
     @GetMapping
     @Operation(summary = "Get the list of all product")
-    public List<ProductResponse> getProducts() {
+    public List<ProductResponse> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @PostMapping
-    @Operation(summary = "Add a new product")
-    public ProductResponse addProduct(@RequestBody ProductRequest request) {
+    @Operation(summary = "Create a new product")
+    public ProductResponse createProduct(@RequestBody ProductRequest request) {
         return productService.createProduct(request);
     }
 

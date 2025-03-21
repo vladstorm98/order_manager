@@ -10,12 +10,12 @@ import lombok.Setter;
 @Setter
 public class AuthRequest {
 
-    @Schema(example = "login")
+    @Schema(example = "vlad")
     @NotBlank
     @Size(min = 3, max = 16)
     private String username;
 
-    @Schema(example = "password")
+    @Schema(example = "1111")
     @NotBlank
     @Size(min = 4, max = 16)
     private String password;

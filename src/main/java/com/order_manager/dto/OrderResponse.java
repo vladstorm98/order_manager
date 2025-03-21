@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class OrderResponse {
+public class OrderResponse implements ResponseDTO {
     private Long id;
     private OrderStatus status;
     private List<Long> productIds;

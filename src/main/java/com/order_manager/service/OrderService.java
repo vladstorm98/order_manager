@@ -28,6 +28,12 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final NotificationService notificationService;
 
+    public List<OrderResponse> getAllOrdersForUser(String username) {
+        return orderRepository.findByUserUsername(username)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
 
     public OrderResponse createOrder(String username, OrderRequest request) {
         UserEntity user = userRepository.findByUsername(username)
@@ -46,14 +52,6 @@ public class OrderService {
                 .build();
 
         return mapToResponse(orderRepository.save(order));
-    }
-
-    @Transactional
-    public List<OrderResponse> getOrdersForUser(String username) {
-        return orderRepository.findByUserUsername(username)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
     }
 
     @Transactional

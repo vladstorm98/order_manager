@@ -1,7 +1,6 @@
 package com.order_manager.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.order_manager.Application;
 import com.order_manager.dto.ProductRequest;
 import com.order_manager.dto.ProductResponse;
 import com.order_manager.service.ProductService;
@@ -20,7 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@SpringBootTest(classes = Application.class)
+@SpringBootTest
 @AutoConfigureMockMvc
 class ProductControllerTest {
 
@@ -42,6 +41,7 @@ class ProductControllerTest {
 
         mockMvc.perform(get("/products"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(products.size()))
                 .andExpect(jsonPath("$[1].name").value("Product 2"));
 
         verify(productService, times(1)).getAllProducts();
@@ -64,12 +64,11 @@ class ProductControllerTest {
     void shouldCreateProduct() throws Exception {
         ProductRequest request = new ProductRequest("Product", "Description", 100);
         ProductResponse product = new ProductResponse(1L, "Product", 100);
-        String json = mapper.writeValueAsString(request);
         when(productService.createProduct(request)).thenReturn(product);
 
         mockMvc.perform(post("/products")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                        .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         verify(productService, times(1)).createProduct(request);
@@ -80,12 +79,11 @@ class ProductControllerTest {
         long id = 1L;
         ProductRequest request = new ProductRequest("Product", "Description", 100);
         ProductResponse product = new ProductResponse(1L, "Product", 100);
-        String json = mapper.writeValueAsString(request);
         when(productService.updateProduct(id, request)).thenReturn(product);
 
         mockMvc.perform(put("/products/" + id)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                        .content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
         verify(productService, times(1)).updateProduct(id, request);
@@ -94,7 +92,6 @@ class ProductControllerTest {
     @Test
     void shouldDeleteProduct() throws Exception {
         long id = 1L;
-        doNothing().when(productService).deleteProduct(id);
 
         mockMvc.perform(delete("/products/" + id))
                 .andExpect(status().isOk());

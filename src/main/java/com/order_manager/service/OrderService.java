@@ -8,6 +8,7 @@ import com.order_manager.entity.ProductEntity;
 import com.order_manager.entity.UserEntity;
 import com.order_manager.exception.OrderNotFoundException;
 import com.order_manager.exception.UserNotFoundException;
+import com.order_manager.mapper.OrderMapper;
 import com.order_manager.repository.OrderRepository;
 import com.order_manager.repository.ProductRepository;
 import com.order_manager.repository.UserRepository;
@@ -27,11 +28,12 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final NotificationService notificationService;
+    private final OrderMapper orderMapper;
 
     public List<OrderResponse> getAllOrdersForUser(String username) {
         List<OrderResponse> response = orderRepository.findByUserUsername(username)
                 .stream()
-                .map(this::mapToResponse)
+                .map(orderMapper::toResponse)
                 .toList();
 
         log.info("Orders were successfully retrieved");
@@ -54,7 +56,7 @@ public class OrderService {
                 .status(OrderStatus.PENDING)
                 .build();
 
-        OrderResponse response = mapToResponse(orderRepository.save(order));
+        OrderResponse response = orderMapper.toResponse(orderRepository.save(order));
 
         log.info("Order with id #{} was created", response.id());
         return response;
@@ -68,7 +70,7 @@ public class OrderService {
 
         notificationService.sendOrderStatusChangeNotification(order.getUser().getEmail(), id, status);
 
-        OrderResponse response = mapToResponse(orderRepository.save(order));
+        OrderResponse response = orderMapper.toResponse(orderRepository.save(order));
 
         log.info("Order with id #{} was updated", id);
         return response;
@@ -82,9 +84,4 @@ public class OrderService {
             throw new EntityNotFoundException("Order with id #" + id + " not found");
         }
     }
-
-    private OrderResponse mapToResponse(OrderEntity order) {
-        return new OrderResponse(order);
-    }
 }
-

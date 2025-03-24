@@ -45,23 +45,24 @@ dependencies {
     implementation 'org.hibernate.orm:hibernate-core'
     implementation 'org.postgresql:postgresql'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
-
+    implementation 'org.mapstruct:mapstruct:1.6.3'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'  // JUnit, Mockito, AssertJ
-    testImplementation 'org.mockito:mockito-core'                           // Дополнительно для Mockito
-    testImplementation 'org.testcontainers:junit-jupiter'                   // Testcontainers для интеграционных тестов
-    testImplementation 'org.testcontainers:postgresql'                      // Testcontainers для PostgreSQL
-    testImplementation 'org.springframework.boot:spring-boot-starter-web'   // Для MockMvc
-    testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-stub-runner'  // Feign
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'            // Для JUnit
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-stub-runner'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 }
 
 tasks.named('test') {
-    useJUnitPlatform()                        // Включаем поддержку JUnit Platform
-    jvmArgs '-XX:+EnableDynamicAgentLoading'  // Для предотвращения предупреждений о динамической загрузке агента
+    useJUnitPlatform()
+    jvmArgs '-XX:+EnableDynamicAgentLoading'
 }

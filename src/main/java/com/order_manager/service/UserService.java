@@ -5,6 +5,7 @@ import com.order_manager.dto.UserResponse;
 import com.order_manager.entity.UserRole;
 import com.order_manager.entity.UserEntity;
 import com.order_manager.exception.UserNotFoundException;
+import com.order_manager.mapper.UserMapper;
 import com.order_manager.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     public UserResponse getUserById(Long id) {
         if (userRepository.findById(id).isEmpty()) {
@@ -28,7 +30,7 @@ public class UserService {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        UserResponse response = toResponse(userRepository.save(user));
+        UserResponse response = userMapper.toResponse(user);
 
         log.info("User with id #{} was retrieved", id);
         return response;
@@ -42,7 +44,7 @@ public class UserService {
         UserEntity user = new UserEntity(
                 request.username(), passwordEncoder.encode(request.password()), UserRole.USER);
 
-        UserResponse response = toResponse(userRepository.save(user));
+        UserResponse response = userMapper.toResponse(userRepository.save(user));
 
         log.info("User with id #{} was created", response.id());
         return response;
@@ -56,7 +58,7 @@ public class UserService {
         UserEntity user = new UserEntity(
                 id, request.username(), passwordEncoder.encode(request.password()), UserRole.USER);
 
-        UserResponse response = toResponse(userRepository.save(user));
+        UserResponse response = userMapper.toResponse(userRepository.save(user));
 
         log.info("User with id #{} was updated", id);
         return response;
@@ -68,9 +70,5 @@ public class UserService {
         }
 
         userRepository.deleteById(id);
-    }
-
-    private UserResponse toResponse(UserEntity user) {
-        return new UserResponse(user);
     }
 }

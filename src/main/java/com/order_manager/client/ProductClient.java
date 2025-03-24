@@ -13,11 +13,11 @@ public interface ProductClient {
     @GetMapping("/products")
     List<ProductResponse> getAllProducts();
 
-    @GetMapping("products/{id}")
-    ProductResponse getProduct(@PathVariable Long id);
-
     @PostMapping("/products")
     ProductResponse createProduct(@RequestBody ProductRequest request);
+
+    @GetMapping("products/{id}")
+    ProductResponse getProduct(@PathVariable Long id);
 
     @PutMapping("/products/{id}")
     ProductResponse updateProduct(@PathVariable Long id, @RequestBody ProductRequest request);

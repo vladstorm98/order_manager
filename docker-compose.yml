@@ -1,0 +1,33 @@
+services:
+  postgres_db:
+    image: postgres:17.4
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 5555
+      POSTGRES_DB: order_manager_db
+    ports:
+      - "5430:5432"
+    networks:
+      - app-network
+
+  order_manager-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: order_manager-api
+    image: order_manager-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5430/order_manager_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 5555
+    depends_on:
+      - postgres_db
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

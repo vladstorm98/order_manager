@@ -3,7 +3,7 @@ package com.order_manager.service;
 import com.order_manager.client.ProductClient;
 import com.order_manager.dto.ProductRequest;
 import com.order_manager.dto.ProductResponse;
-import com.order_manager.exception.ProductCreationException;
+import com.order_manager.exception.ProductExistException;
 import com.order_manager.exception.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class ProductService {
 
     public ProductResponse createProduct(ProductRequest request) {
         ProductResponse response = Optional.ofNullable(productClient.createProduct(request))
-                .orElseThrow(() -> new ProductCreationException("Product creation failed"));
+                .orElseThrow(() -> new ProductExistException("Product already exists"));
 
         log.info("Product with id #{} was created", response.id());
         return response;
@@ -54,7 +54,7 @@ public class ProductService {
 
     public void deleteProduct(long id) {
         Optional.ofNullable(productClient.getProduct(id))
-                .ifPresentOrElse(product -> productClient.deleteProduct(id), () -> {
+                .ifPresentOrElse(_ -> productClient.deleteProduct(id), () -> {
                     throw new ProductNotFoundException("Product with ID " + id + " not found for delete");
                 });
         log.info("Product with id #{} was deleted", id);

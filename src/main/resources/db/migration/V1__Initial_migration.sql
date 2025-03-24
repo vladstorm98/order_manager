@@ -3,7 +3,9 @@ CREATE SEQUENCE IF NOT EXISTS products_seq START WITH 1 INCREMENT BY 50;
 CREATE TABLE order_products
 (
     order_id   BIGINT NOT NULL,
-    product_id BIGINT NOT NULL
+    product_id BIGINT NOT NULL,
+    CONSTRAINT fk_ordpro_on_order_entity FOREIGN KEY (order_id) REFERENCES orders (id),
+    CONSTRAINT fk_ordpro_on_product_entity FOREIGN KEY (product_id) REFERENCES products (id)
 );
 
 CREATE TABLE orders
@@ -12,7 +14,8 @@ CREATE TABLE orders
     user_id  BIGINT                                  NOT NULL,
     quantity INTEGER                                 NOT NULL,
     status   VARCHAR(255),
-    CONSTRAINT pk_orders PRIMARY KEY (id)
+    CONSTRAINT pk_orders PRIMARY KEY (id),
+    CONSTRAINT FK_ORDERS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE products
@@ -21,7 +24,8 @@ CREATE TABLE products
     name        VARCHAR(255)     NOT NULL,
     description VARCHAR(255),
     price       DOUBLE PRECISION NOT NULL,
-    CONSTRAINT pk_products PRIMARY KEY (id)
+    CONSTRAINT pk_products PRIMARY KEY (id),
+    CONSTRAINT uc_products_name UNIQUE (name)
 );
 
 CREATE TABLE users
@@ -31,20 +35,6 @@ CREATE TABLE users
     password VARCHAR(255)                            NOT NULL,
     role     VARCHAR(255)                            NOT NULL,
     email    VARCHAR(255),
-    CONSTRAINT pk_users PRIMARY KEY (id)
+    CONSTRAINT pk_users PRIMARY KEY (id),
+    CONSTRAINT uc_users_name UNIQUE (name)
 );
-
-ALTER TABLE products
-    ADD CONSTRAINT uc_products_name UNIQUE (name);
-
-ALTER TABLE users
-    ADD CONSTRAINT uc_users_name UNIQUE (name);
-
-ALTER TABLE orders
-    ADD CONSTRAINT FK_ORDERS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
-
-ALTER TABLE order_products
-    ADD CONSTRAINT fk_ordpro_on_order_entity FOREIGN KEY (order_id) REFERENCES orders (id);
-
-ALTER TABLE order_products
-    ADD CONSTRAINT fk_ordpro_on_product_entity FOREIGN KEY (product_id) REFERENCES products (id);

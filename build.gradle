@@ -24,15 +24,6 @@ repositories {
     mavenCentral()
 }
 
-flyway {
-    url = 'jdbc:postgresql://localhost:5432/order_manager_db'
-    user = 'postgres'
-    password = '5555'
-    locations = ['classpath:db/migration']  // Путь для миграций
-    baselineOnMigrate = true  // Установка baseline при первом запуске
-    baselineVersion = '1'  // Начальная версия миграции
-}
-
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:2024.0.0"

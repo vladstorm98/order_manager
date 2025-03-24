@@ -6,11 +6,13 @@ import com.order_manager.dto.ProductResponse;
 import com.order_manager.exception.ProductCreationException;
 import com.order_manager.exception.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -18,28 +20,41 @@ public class ProductService {
     private final ProductClient productClient;
 
     public List<ProductResponse> getAllProducts() {
-        return Optional.ofNullable(productClient.getAllProducts())
+        List<ProductResponse> response = Optional.ofNullable(productClient.getAllProducts())
                     .filter(products -> !products.isEmpty())
                     .orElseThrow(() -> new ProductNotFoundException("Products not found"));
-    }
 
-    public ProductResponse getProduct(Long id) {
-        return Optional.ofNullable(productClient.getProduct(id))
-                    .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
+        log.info("Products were retrieved");
+        return response;
     }
 
     public ProductResponse createProduct(ProductRequest request) {
-        return Optional.ofNullable(productClient.createProduct(request))
-                    .orElseThrow(() -> new ProductCreationException("Product creation failed"));
+        ProductResponse response = Optional.ofNullable(productClient.createProduct(request))
+                .orElseThrow(() -> new ProductCreationException("Product creation failed"));
+
+        log.info("Product with id #{} was created", response.id());
+        return response;
+    }
+
+    public ProductResponse getProduct(Long id) {
+        ProductResponse response = Optional.ofNullable(productClient.getProduct(id))
+                    .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
+
+        log.info("Product with id #{} was retrieved", id);
+        return response;
     }
 
     public ProductResponse updateProduct(long id, ProductRequest request) {
-        return Optional.ofNullable(productClient.updateProduct(id, request))
+        ProductResponse response = Optional.ofNullable(productClient.updateProduct(id, request))
                     .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
+
+        log.info("Product with id #{} was updated", id);
+        return response;
     }
 
     public void deleteProduct(long id) {
         productClient.deleteProduct(id);
+        log.info("Product with id #{} was deleted", id);
     }
 }
 

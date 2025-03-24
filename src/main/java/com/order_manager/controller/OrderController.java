@@ -30,7 +30,7 @@ public class OrderController {
     @PostMapping
     @Operation(summary = "Create a new order")
     public OrderResponse createOrder(@AuthenticationPrincipal UserDetails userDetails,
-                                                     @RequestBody OrderRequest request) {
+                                     @RequestBody OrderRequest request) {
         return orderService.createOrder(userDetails.getUsername(), request);
     }
 

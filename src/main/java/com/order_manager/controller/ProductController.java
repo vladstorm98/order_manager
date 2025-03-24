@@ -24,21 +24,27 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get information about product by ID")
+    public ProductResponse getProduct(@PathVariable Long id) {
+        return productService.getProduct(id);
+    }
+
     @PostMapping
     @Operation(summary = "Create a new product")
     public ProductResponse createProduct(@RequestBody ProductRequest request) {
         return productService.createProduct(request);
     }
 
-    @PutMapping("/{productId}")
+    @PutMapping("/{id}")
     @Operation(summary = "Update information about product by ID")
-    public ProductResponse updateProduct(@PathVariable Long productId, @RequestBody ProductRequest request) {
-        return productService.updateProduct(productId, request);
+    public ProductResponse updateProduct(@PathVariable Long id, @RequestBody ProductRequest request) {
+        return productService.updateProduct(id, request);
     }
 
-    @DeleteMapping("/{productId}")
+    @DeleteMapping("/{id}")
     @Operation(summary = "Delete the product by ID")
-    public void deleteProduct(@PathVariable Long productId) {
-        productService.deleteProduct(productId);
+    public void deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
     }
 }

@@ -26,7 +26,7 @@ public class UserWebClient implements UserUrlTemplate {
                 .bodyValue(userRequest)
                 .retrieve()
                 .bodyToMono(UserResponse.class)
-		        .block();
+                .block();
     }
 
     public UserResponse updateUser(Long userId, UserRequest userRequest) {
@@ -46,4 +46,3 @@ public class UserWebClient implements UserUrlTemplate {
                 .block();
     }
 }
-

@@ -8,13 +8,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
-public class UserWebClient {
+public class UserWebClient implements UserUrlTemplate {
 
     private final WebClient webClient;
 
     public UserResponse fetchUser(Long userId) {
         return webClient.get()
-                .uri("/users/{id}", userId)
+                .uri(USER_BY_ID, userId)
                 .retrieve()
                 .bodyToMono(UserResponse.class)
                 .block();
@@ -22,7 +22,7 @@ public class UserWebClient {
 
     public UserResponse createUser(UserRequest userRequest) {
         return webClient.post()
-                .uri("/users")
+                .uri(USERS)
                 .bodyValue(userRequest)
                 .retrieve()
                 .bodyToMono(UserResponse.class)
@@ -31,7 +31,7 @@ public class UserWebClient {
 
     public UserResponse updateUser(Long userId, UserRequest userRequest) {
         return webClient.put()
-                .uri("/users/{id}", userId)
+                .uri(USER_BY_ID, userId)
                 .bodyValue(userRequest)
                 .retrieve()
                 .bodyToMono(UserResponse.class)
@@ -40,7 +40,7 @@ public class UserWebClient {
 
     public void deleteUser(Long userId) {
         webClient.delete()
-                .uri("/users/{id}", userId)
+                .uri(USER_BY_ID, userId)
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();

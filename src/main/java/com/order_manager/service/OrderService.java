@@ -28,17 +28,19 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final NotificationService notificationService;
 
-    @Transactional
     public List<OrderResponse> getAllOrdersForUser(String username) {
-        return orderRepository.findByUserUsername(username)
+        List<OrderResponse> response = orderRepository.findByUserUsername(username)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+
+        log.info("Orders were successfully retrieved");
+        return response;
     }
 
-    public OrderResponse createOrder(String username, OrderRequest request) {
-        UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    public OrderResponse createOrder(String name, OrderRequest request) {
+        UserEntity user = userRepository.findByUsername(name)
+                .orElseThrow(() -> new UserNotFoundException("User with username " + name + " not found"));
 
         List<ProductEntity> products = productRepository.findByIdIn(request.listOfProductId());
         if (products.isEmpty()) {
@@ -52,25 +54,32 @@ public class OrderService {
                 .status(OrderStatus.PENDING)
                 .build();
 
-        return mapToResponse(orderRepository.save(order));
+        OrderResponse response = mapToResponse(orderRepository.save(order));
+
+        log.info("Order with id #{} was created", response.id());
+        return response;
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(Long orderId, OrderStatus status) {
-        OrderEntity order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+    public OrderResponse updateOrderStatus(Long id, OrderStatus status) {
+        OrderEntity order = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id #" + id + " not found"));
         order.setStatus(status);
 
-        notificationService.sendOrderStatusChangeNotification(order.getUser().getEmail(), orderId, status);
+        notificationService.sendOrderStatusChangeNotification(order.getUser().getEmail(), id, status);
 
-        return mapToResponse(orderRepository.save(order));
+        OrderResponse response = mapToResponse(orderRepository.save(order));
+
+        log.info("Order with id #{} was updated", id);
+        return response;
     }
 
-    public void deleteOrder(Long orderId) {
-        if (orderRepository.existsById(orderId)) {
-            orderRepository.deleteById(orderId);
+    public void deleteOrder(Long id) {
+        if (orderRepository.existsById(id)) {
+            orderRepository.deleteById(id);
+            log.info("Order with id #{} was deleted", id);
         } else {
-            throw new EntityNotFoundException("Order not found");
+            throw new EntityNotFoundException("Order with id #" + id + " not found");
         }
     }
 

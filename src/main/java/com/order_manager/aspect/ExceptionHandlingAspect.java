@@ -16,7 +16,7 @@ public class ExceptionHandlingAspect {
         try {
             return joinPoint.proceed();
         } catch (FeignException e) {
-            throw new ExternalServiceException("FeignException in " + joinPoint.getSignature().getName(), e);
+            throw new ExternalServiceException("FeignException in " + joinPoint.getSignature().getName());
         }
     }
 }

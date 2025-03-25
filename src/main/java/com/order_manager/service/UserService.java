@@ -32,7 +32,7 @@ public class UserService {
         }
 
         UserEntity user = new UserEntity(
-                request.name(), passwordEncoder.encode(request.password()), UserRole.USER);
+                request.name(), passwordEncoder.encode(request.password()), UserRole.USER, request.email());
         return userMapper.toResponse(userRepository.save(user));
     }
 
@@ -42,7 +42,7 @@ public class UserService {
         }
 
         UserEntity user = new UserEntity(
-                id, request.name(), passwordEncoder.encode(request.password()), UserRole.USER);
+                id, request.name(), passwordEncoder.encode(request.password()), UserRole.USER, request.email());
         return userMapper.toResponse(userRepository.save(user));
     }
 

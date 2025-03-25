@@ -7,7 +7,8 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
 public class UserEntity {
 
@@ -28,16 +29,10 @@ public class UserEntity {
     @Email
     private String email;
 
-    public UserEntity(String username, String password, UserRole role) {
+    public UserEntity(String username, String password, UserRole role, String email) {
         this.name = username;
         this.password = password;
         this.role = role;
-    }
-
-    public UserEntity(long id, String username, String password, UserRole role) {
-        this.id = id;
-        this.name = username;
-        this.password = password;
-        this.role = role;
+        this.email = email;
     }
 }

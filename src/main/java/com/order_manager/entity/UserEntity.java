@@ -34,9 +34,9 @@ public class UserEntity {
         this.role = role;
     }
 
-    public UserEntity(long id, String username, String password, UserRole role) {
+    public UserEntity(long id, String name, String password, UserRole role) {
         this.id = id;
-        this.name = username;
+        this.name = name;
         this.password = password;
         this.role = role;
     }

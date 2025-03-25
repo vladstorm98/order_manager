@@ -35,10 +35,10 @@ public class AuthController {
     public AuthResponse login(@RequestBody UserRequest request) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+                new UsernamePasswordAuthenticationToken(request.name(), request.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String token = jwtTokenProvider.createToken(request.username());
+        String token = jwtTokenProvider.createToken(request.name());
 
         return new AuthResponse(token);
     }

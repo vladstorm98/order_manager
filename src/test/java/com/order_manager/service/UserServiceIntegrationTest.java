@@ -25,11 +25,6 @@ public class UserServiceIntegrationTest extends BaseTest {
     @Autowired
     private UserMapper userMapper;
 
-    @AfterEach
-    void afterEach() {
-        userRepository.deleteAll();
-    }
-
     @Test
     @DisplayName("""
             GIVEN a user request

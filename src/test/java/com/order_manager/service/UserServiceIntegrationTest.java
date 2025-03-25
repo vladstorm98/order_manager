@@ -18,6 +18,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Integration tests for UserService")
 public class UserServiceIntegrationTest extends BaseTest {
 
+    private static final String NAME = "Name";
+    private static final String UPDATED_NAME = "UpdatedName";
+    private static final String PASSWORD = "Password";
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -33,7 +37,7 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
     void shouldCreateUser() {
         // GIVEN
-        UserRequest request = new UserRequest("Anton", "Password");
+        UserRequest request = new UserRequest(NAME, PASSWORD);
 
         // WHEN
         UserResponse createdUser = userService.createUser(request);
@@ -106,7 +110,7 @@ public class UserServiceIntegrationTest extends BaseTest {
         void shouldUpdateUser() {
             // GIVEN
             Long id = createdUser.id();
-            UserRequest request = new UserRequest("UpdatedName", "UpdatedPassword");
+            UserRequest request = new UserRequest(UPDATED_NAME, PASSWORD);
 
             // WHEN
             UserResponse updatedUser = userService.updateUser(id, request);
@@ -138,6 +142,6 @@ public class UserServiceIntegrationTest extends BaseTest {
     }
 
     private static UserResponse createDefaultUser(UserService userService) {
-        return userService.createUser(new UserRequest("Name", "Password"));
+        return userService.createUser(new UserRequest(NAME, PASSWORD));
     }
 }

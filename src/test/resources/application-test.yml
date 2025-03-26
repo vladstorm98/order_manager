@@ -6,5 +6,5 @@ spring:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
   flyway:
     enabled: true
-    locations: classpath:db/migration
+    locations: classpath:db/migration, classpath:db/migration/test
     clean-disabled: false

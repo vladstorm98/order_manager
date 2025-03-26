@@ -32,15 +32,6 @@ public class UserService {
         return response;
     }
 
-    public UserResponse getUserById(Long id) {
-        UserResponse response = userRepository.findById(id)
-                .map(userMapper::toResponse)
-                .orElseThrow(() -> new UserNotFoundException("User with id #" + id + " not found"));
-
-        log.info("User with id #{} was retrieved", id);
-        return response;
-    }
-
     public UserResponse createUser(UserRequest request) {
         if (userRepository.findByName(request.name()).isPresent()) {
             throw new EntityExistsException("User with name " + request.name() + " already exists");
@@ -48,10 +39,19 @@ public class UserService {
 
         UserEntity user = new UserEntity(
                 request.name(), passwordEncoder.encode(request.password()), UserRole.USER, request.email());
-        
+
         UserResponse response = userMapper.toResponse(userRepository.save(user));
 
         log.info("User with id #{} was created", response.id());
+        return response;
+    }
+
+    public UserResponse getUserById(Long id) {
+        UserResponse response = userRepository.findById(id)
+                .map(userMapper::toResponse)
+                .orElseThrow(() -> new UserNotFoundException("User with id #" + id + " not found"));
+
+        log.info("User with id #{} was retrieved", id);
         return response;
     }
 

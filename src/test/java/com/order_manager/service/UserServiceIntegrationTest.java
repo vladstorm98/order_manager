@@ -3,6 +3,8 @@ package com.order_manager.service;
 import com.order_manager.BaseTest;
 import com.order_manager.dto.UserRequest;
 import com.order_manager.dto.UserResponse;
+import com.order_manager.exception.UserNotFoundException;
+import com.order_manager.mapper.UserMapper;
 import com.order_manager.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +16,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Integration tests for UserService")
 public class UserServiceIntegrationTest extends BaseTest {
 
-    private static final String NAME_1 = "Name_1";
-    private static final String NAME_2 = "Name_2";
-    private static final String UPDATED_NAME = "UpdatedName";
-    private static final String PASSWORD = "Password";
-    private static final String EMAIL = "email@gmail.com";
+    private static final Long USER_ID = 1L;
+    private static final String NEW_NAME = "NewName";
+    private static final String NEW_PASSWORD = "Password";
+    private static final String NEW_EMAIL = "example@gmail.com";
 
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserMapper userMapper;
 
     @Test
     @DisplayName("""
@@ -33,7 +36,7 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
     void shouldCreateUser() {
         // GIVEN
-        var request = new UserRequest(NAME_1, PASSWORD, EMAIL);
+        var request = new UserRequest(NEW_NAME, NEW_PASSWORD, NEW_EMAIL);
 
         // WHEN
         var createdUser = userService.createUser(request);
@@ -41,11 +44,11 @@ public class UserServiceIntegrationTest extends BaseTest {
         // THEN
         assertThat(createdUser).isNotNull()
                 .satisfies(user -> {
-                    assertThat(user.name()).isEqualTo(NAME_1);
-                    assertThat(user.email()).isEqualTo(EMAIL);
+                    assertThat(user.name()).isEqualTo(NEW_NAME);
+                    assertThat(user.email()).isEqualTo(NEW_EMAIL);
         });
 
-        assertThat(userRepository.findByName(NAME_1)).isPresent();
+        assertThat(userRepository.findByName(NEW_NAME)).isPresent();
     }
 
     @Nested
@@ -56,7 +59,7 @@ public class UserServiceIntegrationTest extends BaseTest {
 
         @BeforeEach
         void beforeEach() {
-            createdUser = createDefaultUser(userService);
+            createdUser = getUserFromDb();
         }
 
         @Test
@@ -67,7 +70,7 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
         void shouldGetAllUsers() {
             // GIVEN
-            var createdUsers = createListOfUsers(userService);
+            var createdUsers = getAllUsersFromDb();
 
             // WHEN
             var fetchedUsers = userService.getAllUsers();
@@ -80,8 +83,8 @@ public class UserServiceIntegrationTest extends BaseTest {
             assertThat(fetchedUsers.getFirst())
                     .satisfies(user -> {
                             assertThat(user.id()).isEqualTo(createdUser.id());
-                            assertThat(user.name()).isEqualTo(NAME_1);
-                            assertThat(user.email()).isEqualTo(EMAIL);
+                            assertThat(user.name()).isEqualTo(createdUser.name());
+                            assertThat(user.email()).isEqualTo(createdUser.email());
             });
         }
 
@@ -116,7 +119,7 @@ public class UserServiceIntegrationTest extends BaseTest {
         void shouldUpdateUser() {
             // GIVEN
             var id = createdUser.id();
-            var request = new UserRequest(UPDATED_NAME, PASSWORD, EMAIL);
+            var request = new UserRequest(NEW_NAME, NEW_PASSWORD, NEW_EMAIL);
 
             // WHEN
             var updatedUser = userService.updateUser(id, request);
@@ -125,8 +128,8 @@ public class UserServiceIntegrationTest extends BaseTest {
             assertThat(updatedUser).isNotNull()
                     .satisfies(user -> {
                             assertThat(user.id()).isEqualTo(createdUser.id());
-                            assertThat(user.name()).isEqualTo(UPDATED_NAME);
-                            assertThat(user.email()).isEqualTo(EMAIL);
+                            assertThat(user.name()).isEqualTo(NEW_NAME);
+                            assertThat(user.email()).isEqualTo(NEW_EMAIL);
             });
 
             assertThat(userRepository.findById(id)).isPresent();
@@ -150,14 +153,15 @@ public class UserServiceIntegrationTest extends BaseTest {
         }
     }
 
-    private static UserResponse createDefaultUser(UserService userService) {
-        return userService.createUser(new UserRequest(NAME_1, PASSWORD, EMAIL));
+    private UserResponse getUserFromDb() {
+        return userRepository.findById(USER_ID)
+                .map(userMapper::toResponse)
+                .orElseThrow(() -> new UserNotFoundException("Product with ID " + USER_ID + " not found"));
     }
 
-    private static List<UserResponse> createListOfUsers(UserService userService) {
-        return List.of(
-                userService.createUser(new UserRequest(NAME_1, PASSWORD, EMAIL)),
-                userService.createUser(new UserRequest(NAME_2, PASSWORD, EMAIL))
-        );
+    private List<UserResponse> getAllUsersFromDb() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toResponse)
+                .toList();
     }
 }

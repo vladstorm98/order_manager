@@ -38,3 +38,7 @@ logging:
 jwt:
   secret: your-very-long-secret-key-that-is-at-least-32-chars
   expiration: 86400
+
+# WebClient
+webclient:
+  base-url: http://localhost:8080

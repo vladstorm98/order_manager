@@ -66,6 +66,6 @@ dependencies {
 }
 
 tasks.named('test') {
-    useJUnitPlatform()                        // Включаем поддержку JUnit Platform
-    jvmArgs '-XX:+EnableDynamicAgentLoading'  // Для предотвращения предупреждений о динамической загрузке агента
+    useJUnitPlatform()
+    jvmArgs '-XX:+EnableDynamicAgentLoading'
 }

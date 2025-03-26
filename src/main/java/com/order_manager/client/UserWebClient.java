@@ -1,4 +1,4 @@
-package com.order_manager.service;
+package com.order_manager.client;
 
 import com.order_manager.dto.UserRequest;
 import com.order_manager.dto.UserResponse;
@@ -8,13 +8,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
-public class UserWebClientService {
+public class UserWebClient implements UserUrlTemplate {
 
     private final WebClient webClient;
 
     public UserResponse fetchUser(Long userId) {
         return webClient.get()
-                .uri("/users/{id}", userId)
+                .uri(USER_BY_ID, userId)
                 .retrieve()
                 .bodyToMono(UserResponse.class)
                 .block();
@@ -22,16 +22,16 @@ public class UserWebClientService {
 
     public UserResponse createUser(UserRequest userRequest) {
         return webClient.post()
-                .uri("/users")
+                .uri(USERS)
                 .bodyValue(userRequest)
                 .retrieve()
                 .bodyToMono(UserResponse.class)
-		        .block();
+                .block();
     }
 
     public UserResponse updateUser(Long userId, UserRequest userRequest) {
         return webClient.put()
-                .uri("/users/{id}", userId)
+                .uri(USER_BY_ID, userId)
                 .bodyValue(userRequest)
                 .retrieve()
                 .bodyToMono(UserResponse.class)
@@ -40,10 +40,9 @@ public class UserWebClientService {
 
     public void deleteUser(Long userId) {
         webClient.delete()
-                .uri("/users/{id}", userId)
+                .uri(USER_BY_ID, userId)
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
     }
 }
-

@@ -42,8 +42,8 @@ public class UserService {
         }
 
         UserEntity user = new UserEntity(
-                request.name(), passwordEncoder.encode(request.password()), UserRole.USER);
-
+                request.name(), passwordEncoder.encode(request.password()), UserRole.USER, request.email());
+        
         UserResponse response = userMapper.toResponse(userRepository.save(user));
 
         log.info("User with id #{} was created", response.id());
@@ -56,7 +56,7 @@ public class UserService {
         }
 
         UserEntity user = new UserEntity(
-                id, request.name(), passwordEncoder.encode(request.password()), UserRole.USER);
+                id, request.name(), passwordEncoder.encode(request.password()), UserRole.USER, request.email());
 
         UserResponse response = userMapper.toResponse(userRepository.save(user));
 

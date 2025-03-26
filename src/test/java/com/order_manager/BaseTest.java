@@ -14,10 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @ActiveProfiles("test")
 public abstract class BaseTest {
 
-    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17.4")
-            .withDatabaseName("test_db")
-            .withUsername("test_user")
-            .withPassword("test_pass");
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17.4");
 
     @Autowired
     private Flyway flyway;

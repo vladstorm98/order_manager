@@ -3,31 +3,27 @@ package com.order_manager.service;
 import com.order_manager.BaseTest;
 import com.order_manager.dto.UserRequest;
 import com.order_manager.dto.UserResponse;
-import com.order_manager.entity.UserEntity;
-import com.order_manager.mapper.UserMapper;
 import com.order_manager.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Integration tests for UserService")
 public class UserServiceIntegrationTest extends BaseTest {
 
-    private static final String NAME = "Name";
+    private static final String NAME_1 = "Name_1";
+    private static final String NAME_2 = "Name_2";
     private static final String UPDATED_NAME = "UpdatedName";
     private static final String PASSWORD = "Password";
+    private static final String EMAIL = "email@gmail.com";
 
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private UserService userService;
-    @Autowired
-    private UserMapper userMapper;
 
     @Test
     @DisplayName("""
@@ -37,17 +33,19 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
     void shouldCreateUser() {
         // GIVEN
-        UserRequest request = new UserRequest(NAME, PASSWORD);
+        var request = new UserRequest(NAME_1, PASSWORD, EMAIL);
 
         // WHEN
-        UserResponse createdUser = userService.createUser(request);
+        var createdUser = userService.createUser(request);
 
         // THEN
-        assertThat(createdUser).isNotNull();
-        assertThat(createdUser.name()).isEqualTo(request.name());
+        assertThat(createdUser).isNotNull()
+                .satisfies(user -> {
+                    assertThat(user.name()).isEqualTo(NAME_1);
+                    assertThat(user.email()).isEqualTo(EMAIL);
+        });
 
-        Optional<UserEntity> userFromDb = userRepository.findByName(request.name());
-        assertThat(userFromDb).isPresent().map(UserEntity::getName).get().isEqualTo(request.name());
+        assertThat(userRepository.findByName(NAME_1)).isPresent();
     }
 
     @Nested
@@ -69,16 +67,22 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
         void shouldGetAllUsers() {
             // GIVEN
-            List<UserResponse> createdUsers = List.of(createdUser);
+            var createdUsers = createListOfUsers(userService);
 
             // WHEN
-            List<UserResponse> fetchedUsers = userRepository.findAll().stream()
-                    .map(userMapper::toResponse)
-                    .collect(Collectors.toList());
+            var fetchedUsers = userService.getAllUsers();
 
             // THEN
-            assertThat(fetchedUsers).isNotEmpty();
-            assertThat(fetchedUsers).containsAll(createdUsers);
+            assertThat(fetchedUsers).isNotNull()
+                    .hasSize(createdUsers.size())
+                    .containsExactlyInAnyOrderElementsOf(createdUsers);
+
+            assertThat(fetchedUsers.getFirst())
+                    .satisfies(user -> {
+                            assertThat(user.id()).isEqualTo(createdUser.id());
+                            assertThat(user.name()).isEqualTo(NAME_1);
+                            assertThat(user.email()).isEqualTo(EMAIL);
+            });
         }
 
         @Test
@@ -89,15 +93,17 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
         void shouldGetUserById() {
             // GIVEN
-            Long id = createdUser.id();
+            var id = createdUser.id();
 
             // WHEN
-            UserResponse fetchedUser = userService.getUserById(id);
+            var fetchedUser = userService.getUserById(id);
 
             // THEN
-            assertThat(fetchedUser).isNotNull().satisfies( user -> {
-                assertThat(user.id()).isEqualTo(createdUser.id());
-                assertThat(user.name()).isEqualTo(createdUser.name());
+            assertThat(fetchedUser).isNotNull()
+                    .satisfies( user -> {
+                            assertThat(user.id()).isEqualTo(createdUser.id());
+                            assertThat(user.name()).isEqualTo(createdUser.name());
+                            assertThat(user.email()).isEqualTo(createdUser.email());
             });
         }
 
@@ -109,18 +115,21 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
         void shouldUpdateUser() {
             // GIVEN
-            Long id = createdUser.id();
-            UserRequest request = new UserRequest(UPDATED_NAME, PASSWORD);
+            var id = createdUser.id();
+            var request = new UserRequest(UPDATED_NAME, PASSWORD, EMAIL);
 
             // WHEN
-            UserResponse updatedUser = userService.updateUser(id, request);
+            var updatedUser = userService.updateUser(id, request);
 
             // THEN
-            assertThat(updatedUser).isNotNull();
-            assertThat(updatedUser.name()).isEqualTo(request.name());
+            assertThat(updatedUser).isNotNull()
+                    .satisfies(user -> {
+                            assertThat(user.id()).isEqualTo(createdUser.id());
+                            assertThat(user.name()).isEqualTo(UPDATED_NAME);
+                            assertThat(user.email()).isEqualTo(EMAIL);
+            });
 
-            Optional<UserEntity> userFromDb = userRepository.findById(id);
-            assertThat(userFromDb).isPresent().map(UserEntity::getName).get().isEqualTo(request.name());
+            assertThat(userRepository.findById(id)).isPresent();
         }
 
         @Test
@@ -131,7 +140,7 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
         void shouldDeleteUser() {
             // GIVEN
-            Long id = createdUser.id();
+            var id = createdUser.id();
 
             // WHEN
             userService.deleteUser(id);
@@ -142,6 +151,13 @@ public class UserServiceIntegrationTest extends BaseTest {
     }
 
     private static UserResponse createDefaultUser(UserService userService) {
-        return userService.createUser(new UserRequest(NAME, PASSWORD));
+        return userService.createUser(new UserRequest(NAME_1, PASSWORD, EMAIL));
+    }
+
+    private static List<UserResponse> createListOfUsers(UserService userService) {
+        return List.of(
+                userService.createUser(new UserRequest(NAME_1, PASSWORD, EMAIL)),
+                userService.createUser(new UserRequest(NAME_2, PASSWORD, EMAIL))
+        );
     }
 }

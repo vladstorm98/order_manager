@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,15 +23,19 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
+    public List<UserResponse> getAllUsers() {
+        List<UserResponse> response = userRepository.findAll().stream()
+                .map(userMapper::toResponse)
+                .toList();
+
+        log.info("Users was retrieved");
+        return response;
+    }
+
     public UserResponse getUserById(Long id) {
-        if (userRepository.findById(id).isEmpty()) {
-            throw new UserNotFoundException("User with id #" + id + " not found");
-        }
-
-        UserEntity user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        UserResponse response = userMapper.toResponse(user);
+        UserResponse response = userRepository.findById(id)
+                .map(userMapper::toResponse)
+                .orElseThrow(() -> new UserNotFoundException("User with id #" + id + " not found"));
 
         log.info("User with id #{} was retrieved", id);
         return response;
@@ -50,7 +55,7 @@ public class UserService {
         return response;
     }
 
-    public UserResponse updateUser(long id, UserRequest request) {
+    public UserResponse updateUser(Long id, UserRequest request) {
         if (userRepository.findById(id).isEmpty()) {
             throw new UserNotFoundException("User with id #" + id + " not found");
         }
@@ -64,7 +69,7 @@ public class UserService {
         return response;
     }
 
-    public void deleteUser(long id) {
+    public void deleteUser(Long id) {
         if (userRepository.findById(id).isEmpty()) {
             throw new UserNotFoundException("User with id #" + id + " not found");
         }

@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: order_manager
+  main:
+    banner-mode: off
+
+  # Database
+  datasource:
+    url: jdbc:postgresql://localhost:5430/order_manager_db
+    username: postgres
+    password: 5555
+    driver-class-name: org.postgresql.Driver
+
+  # Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Logging
+logging:
+  file:
+    name: logs/app.log
+  level:
+    root: ERROR
+    com:
+      order_manager: DEBUG
+      order_manager.Application: ERROR
+      order_manager.security.JwtAuthFilter: ERROR
+    org:
+      hibernate: ERROR
+
+# JWT
+jwt:
+  secret: your-very-long-secret-key-that-is-at-least-32-chars
+  expiration: 86400

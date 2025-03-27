@@ -9,5 +9,5 @@ public record OrderRequest (
         List<Long> listOfProductId,
 
         @Schema(example = "1")
-        int quantity
+        Integer quantity
 ) {}

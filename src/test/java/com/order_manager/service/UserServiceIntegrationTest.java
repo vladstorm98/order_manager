@@ -14,15 +14,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Integration tests for UserService")
 public class UserServiceIntegrationTest extends BaseTest {
 
-    private static final Long FIRST_USER_ID = 1L;
-    private static final Long SECOND_USER_ID = 2L;
-    private static final String FIRST_USER_NAME = "Name_1";
-    private static final String FIRST_USER_EMAIL = "email_1@gmail.com";
-    private static final String SECOND_USER_NAME = "Name_2";
-    private static final String SECOND_USER_EMAIL = "email_2@gmail.com";
-    private static final String NEW_USER_NAME = "NewName";
-    private static final String NEW_USER_PASSWORD = "NewPassword";
-    private static final String NEW_USER_EMAIL = "new_email@gmail.com";
+    private static final Long USER_ID_1 = 1L;
+    private static final Long USER_ID_2 = 2L;
+    private static final String USER_NAME_1 = "Name_1";
+    private static final String USER_NAME_2 = "Name_2";
+    private static final String USER_NAME_NEW = "NewName";
+    private static final String USER_PASSWORD_NEW = "NewPassword";
+    private static final String USER_EMAIL_1 = "email_1@example.com";
+    private static final String USER_EMAIL_2 = "email_2@example.com";
+    private static final String USER_EMAIL_NEW = "email_new@example.com";
 
     @Autowired
     private UserRepository userRepository;
@@ -37,7 +37,7 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
     void shouldCreateUser() {
         // GIVEN
-        var request = new UserRequest(NEW_USER_NAME, NEW_USER_PASSWORD, NEW_USER_EMAIL);
+        var request = new UserRequest(USER_NAME_NEW, USER_PASSWORD_NEW, USER_EMAIL_NEW);
 
         // WHEN
         var createdUser = userService.createUser(request);
@@ -49,7 +49,7 @@ public class UserServiceIntegrationTest extends BaseTest {
                     assertThat(user.email()).isEqualTo(request.email());
         });
 
-        assertThat(userRepository.findByName(NEW_USER_NAME)).isPresent();
+        assertThat(userRepository.findByName(USER_NAME_NEW)).isPresent();
     }
 
     @Nested
@@ -64,22 +64,21 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
         void shouldGetAllUsers() {
             // GIVEN
-            var allExpectedUsers = getAllUsers();
-            var expectedUser = getFirstUser();
+            var expectedUsers = prepareUsers();
 
             // WHEN
             var actualUsers = userService.getAllUsers();
 
             // THEN
             assertThat(actualUsers).isNotNull()
-                    .hasSize(allExpectedUsers.size())
-                    .containsExactlyInAnyOrderElementsOf(allExpectedUsers);
+                    .hasSize(expectedUsers.size())
+                    .containsExactlyInAnyOrderElementsOf(expectedUsers);
 
             assertThat(actualUsers.getFirst())
                     .satisfies(user -> {
-                            assertThat(user.id()).isEqualTo(expectedUser.id());
-                            assertThat(user.name()).isEqualTo(expectedUser.name());
-                            assertThat(user.email()).isEqualTo(expectedUser.email());
+                            assertThat(user.id()).isEqualTo(expectedUsers.getFirst().id());
+                            assertThat(user.name()).isEqualTo(expectedUsers.getFirst().name());
+                            assertThat(user.email()).isEqualTo(expectedUsers.getFirst().email());
             });
         }
 
@@ -91,17 +90,17 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
         void shouldGetUserById() {
             // GIVEN
-            var createdUser = getFirstUser();
+            var expectedUser = prepareUser();
 
             // WHEN
-            var actualUsers = userService.getUserById(createdUser.id());
+            var actualUser = userService.getUserById(expectedUser.id());
 
             // THEN
-            assertThat(actualUsers).isNotNull()
+            assertThat(actualUser).isNotNull()
                     .satisfies( user -> {
-                            assertThat(user.id()).isEqualTo(createdUser.id());
-                            assertThat(user.name()).isEqualTo(createdUser.name());
-                            assertThat(user.email()).isEqualTo(createdUser.email());
+                            assertThat(user.id()).isEqualTo(expectedUser.id());
+                            assertThat(user.name()).isEqualTo(expectedUser.name());
+                            assertThat(user.email()).isEqualTo(expectedUser.email());
             });
         }
 
@@ -113,8 +112,8 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
         void shouldUpdateUser() {
             // GIVEN
-            var oldUser = getFirstUser();
-            var request = new UserRequest(NEW_USER_NAME, NEW_USER_PASSWORD, NEW_USER_EMAIL);
+            var oldUser = prepareUser();
+            var request = new UserRequest(USER_NAME_NEW, USER_PASSWORD_NEW, USER_EMAIL_NEW);
 
             // WHEN
             var updatedUser = userService.updateUser(oldUser.id(), request);
@@ -138,7 +137,7 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
         void shouldDeleteUser() {
             // GIVEN
-            var user = getFirstUser();
+            var user = prepareUser();
 
             // WHEN
             userService.deleteUser(user.id());
@@ -148,14 +147,18 @@ public class UserServiceIntegrationTest extends BaseTest {
         }
     }
 
-    private UserResponse getFirstUser() {
-        return new UserResponse(FIRST_USER_ID, FIRST_USER_NAME, FIRST_USER_EMAIL);
+    private UserResponse prepareUser(Long id, String name, String email) {
+        return new UserResponse(id, name, email);
     }
 
-    private List<UserResponse> getAllUsers() {
+    private UserResponse prepareUser() {
+        return prepareUser(USER_ID_1, USER_NAME_1, USER_EMAIL_1);
+    }
+
+    private List<UserResponse> prepareUsers() {
         return List.of(
-                new UserResponse(FIRST_USER_ID, FIRST_USER_NAME, FIRST_USER_EMAIL),
-                new UserResponse(SECOND_USER_ID, SECOND_USER_NAME, SECOND_USER_EMAIL)
+                prepareUser(USER_ID_1, USER_NAME_1, USER_EMAIL_1),
+                prepareUser(USER_ID_2, USER_NAME_2, USER_EMAIL_2)
         );
     }
 }

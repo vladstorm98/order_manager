@@ -16,7 +16,7 @@ public class OrderEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -31,7 +31,7 @@ public class OrderEntity {
     @Builder.Default
     private List<ProductEntity> products = new ArrayList<>();
 
-    private int quantity;
+    private Integer quantity;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

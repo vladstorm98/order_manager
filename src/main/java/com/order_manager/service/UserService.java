@@ -8,6 +8,7 @@ import com.order_manager.exception.UserNotFoundException;
 import com.order_manager.mapper.UserMapper;
 import com.order_manager.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,7 +48,7 @@ public class UserService {
         return response;
     }
 
-    public UserResponse getUserById(long id) {
+    public UserResponse getUserById(@NonNull Long id) {
         UserResponse response = userRepository.findById(id)
                 .map(userMapper::toResponse)
                 .orElseThrow(() -> new UserNotFoundException("User with id #" + id + " not found"));
@@ -56,7 +57,7 @@ public class UserService {
         return response;
     }
 
-    public UserResponse updateUser(long id, UserRequest request) {
+    public UserResponse updateUser(@NonNull Long id, UserRequest request) {
         if (userRepository.findById(id).isEmpty()) {
             throw new UserNotFoundException("User with id #" + id + " not found");
         }
@@ -70,7 +71,7 @@ public class UserService {
         return response;
     }
 
-    public void deleteUser(long id) {
+    public void deleteUser(@NonNull Long id) {
         userRepository.findById(id)
                 .ifPresentOrElse(userRepository::delete,
                         () -> { throw new UserNotFoundException("User with id #" + id + " not found"); });

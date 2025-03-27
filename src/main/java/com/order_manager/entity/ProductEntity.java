@@ -3,6 +3,8 @@ package com.order_manager.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Getter
 @Setter
@@ -14,12 +16,12 @@ public class ProductEntity {
 
     @Id
     @GeneratedValue
-    private long id;
+    private Long id;
 
     @Column(unique=true, nullable=false)
     private String name;
 
     private String description;
 
-    private double price;
+    private BigDecimal price;
 }

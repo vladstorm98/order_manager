@@ -5,6 +5,7 @@ import com.order_manager.dto.ProductRequest;
 import com.order_manager.dto.ProductResponse;
 import com.order_manager.exception.ProductExistException;
 import com.order_manager.exception.ProductNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class ProductService {
         return response;
     }
 
-    public ProductResponse getProduct(long id) {
+    public ProductResponse getProduct(@NonNull Long id) {
         ProductResponse response = Optional.ofNullable(productClient.getProduct(id))
                     .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
 
@@ -44,7 +45,7 @@ public class ProductService {
         return response;
     }
 
-    public ProductResponse updateProduct(long id, ProductRequest request) {
+    public ProductResponse updateProduct(@NonNull Long id, ProductRequest request) {
         ProductResponse response = Optional.ofNullable(productClient.updateProduct(id, request))
                     .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
 
@@ -52,7 +53,7 @@ public class ProductService {
         return response;
     }
 
-    public void deleteProduct(long id) {
+    public void deleteProduct(@NonNull Long id) {
         Optional.ofNullable(productClient.getProduct(id))
                 .ifPresentOrElse(_ -> productClient.deleteProduct(id), () -> {
                     throw new ProductNotFoundException("Product with ID " + id + " not found for delete");

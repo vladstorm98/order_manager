@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -46,7 +47,7 @@ public class UserService {
         return response;
     }
 
-    public UserResponse getUserById(Long id) {
+    public UserResponse getUserById(long id) {
         UserResponse response = userRepository.findById(id)
                 .map(userMapper::toResponse)
                 .orElseThrow(() -> new UserNotFoundException("User with id #" + id + " not found"));
@@ -55,7 +56,7 @@ public class UserService {
         return response;
     }
 
-    public UserResponse updateUser(Long id, UserRequest request) {
+    public UserResponse updateUser(long id, UserRequest request) {
         if (userRepository.findById(id).isEmpty()) {
             throw new UserNotFoundException("User with id #" + id + " not found");
         }
@@ -69,11 +70,11 @@ public class UserService {
         return response;
     }
 
-    public void deleteUser(Long id) {
-        if (userRepository.findById(id).isEmpty()) {
-            throw new UserNotFoundException("User with id #" + id + " not found");
-        }
+    public void deleteUser(long id) {
+        userRepository.findById(id)
+                .ifPresentOrElse(userRepository::delete,
+                        () -> { throw new UserNotFoundException("User with id #" + id + " not found"); });
 
-        userRepository.deleteById(id);
+        log.info("Product with id #{} was deleted", id);
     }
 }

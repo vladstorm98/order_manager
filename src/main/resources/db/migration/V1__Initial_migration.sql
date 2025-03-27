@@ -4,7 +4,7 @@ CREATE TABLE users
     name     TEXT                                    NOT NULL,
     password TEXT                                    NOT NULL,
     role     TEXT                                    NOT NULL,
-    email    TEXT,                                -- NOT NULL, -- TODO: open this hint after merge with #10 pull request
+    email    TEXT                                    NOT NULL,
     CONSTRAINT pk_users PRIMARY KEY (id),
     CONSTRAINT uc_users_name UNIQUE (name)
 );

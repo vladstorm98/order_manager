@@ -36,7 +36,7 @@ public class ProductService {
         return response;
     }
 
-    public ProductResponse getProduct(Long id) {
+    public ProductResponse getProduct(long id) {
         ProductResponse response = Optional.ofNullable(productClient.getProduct(id))
                     .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
 

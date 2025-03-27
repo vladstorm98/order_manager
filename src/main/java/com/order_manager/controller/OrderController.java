@@ -37,14 +37,14 @@ public class OrderController {
     @PutMapping("/{orderId}")
     @Operation(summary = "Update status of the order by ID")
     public OrderResponse updateOrderStatus(@Parameter(description = "Type ID of the order to be updated")
-                                           @PathVariable Long orderId) {
+                                           @PathVariable long orderId) {
         return orderService.updateOrderStatus(orderId, OrderStatus.COMPLETED);
     }
 
     @DeleteMapping("/{orderId}")
     @Operation(summary = "Delete the order by ID")
     public void deleteOrder(@Parameter(description = "Type ID of the order to be deleted")
-                            @PathVariable Long orderId) {
+                            @PathVariable long orderId) {
         orderService.deleteOrder(orderId);
     }
 }

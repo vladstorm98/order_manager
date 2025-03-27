@@ -14,7 +14,7 @@ public class ProductEntity {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
 
     @Column(unique=true, nullable=false)
     private String name;

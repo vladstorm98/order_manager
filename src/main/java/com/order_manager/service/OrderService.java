@@ -63,7 +63,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(Long id, OrderStatus status) {
+    public OrderResponse updateOrderStatus(long id, OrderStatus status) {
         OrderEntity order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Order with id #" + id + " not found"));
         order.setStatus(status);
@@ -76,7 +76,7 @@ public class OrderService {
         return response;
     }
 
-    public void deleteOrder(Long id) {
+    public void deleteOrder(long id) {
         if (orderRepository.existsById(id)) {
             orderRepository.deleteById(id);
             log.info("Order with id #{} was deleted", id);

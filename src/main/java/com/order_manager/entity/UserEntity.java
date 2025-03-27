@@ -1,36 +1,38 @@
 package com.order_manager.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor(force = true)
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
 public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(unique = true, nullable = false)
-    private final String username;
+    private String name;
 
     @Column(nullable = false)
-    private final String password;
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private final UserRole role;
+    private UserRole role;
 
+    @Email
     private String email;
 
-    public UserEntity(long id, String username, String password, UserRole role) {
-        this.id = id;
-        this.username = username;
+    public UserEntity(String username, String password, UserRole role, String email) {
+        this.name = username;
         this.password = password;
         this.role = role;
+        this.email = email;
     }
 }

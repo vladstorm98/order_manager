@@ -14,6 +14,7 @@ import com.order_manager.repository.ProductRepository;
 import com.order_manager.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class OrderService {
     private final OrderMapper orderMapper;
 
     public List<OrderResponse> getAllOrdersForUser(String username) {
-        List<OrderResponse> response = orderRepository.findByUserUsername(username)
+        List<OrderResponse> response = orderRepository.findByUserName(username)
                 .stream()
                 .map(orderMapper::toResponse)
                 .toList();
@@ -41,7 +42,7 @@ public class OrderService {
     }
 
     public OrderResponse createOrder(String name, OrderRequest request) {
-        UserEntity user = userRepository.findByUsername(name)
+        UserEntity user = userRepository.findByName(name)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + name + " not found"));
 
         List<ProductEntity> products = productRepository.findByIdIn(request.listOfProductId());
@@ -63,7 +64,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(Long id, OrderStatus status) {
+    public OrderResponse updateOrderStatus(@NonNull Long id, OrderStatus status) {
         OrderEntity order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Order with id #" + id + " not found"));
         order.setStatus(status);
@@ -76,7 +77,7 @@ public class OrderService {
         return response;
     }
 
-    public void deleteOrder(Long id) {
+    public void deleteOrder(@NonNull Long id) {
         if (orderRepository.existsById(id)) {
             orderRepository.deleteById(id);
             log.info("Order with id #{} was deleted", id);

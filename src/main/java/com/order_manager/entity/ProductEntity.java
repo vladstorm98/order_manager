@@ -3,6 +3,8 @@ package com.order_manager.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Getter
 @Setter
@@ -21,5 +23,5 @@ public class ProductEntity {
 
     private String description;
 
-    private double price;
+    private BigDecimal price;
 }

@@ -8,10 +8,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Table(name = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Table(name = "orders")
 public class OrderEntity {
 
     @Id
@@ -28,11 +27,17 @@ public class OrderEntity {
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    @Builder.Default
     private List<ProductEntity> products = new ArrayList<>();
 
     private Integer quantity;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
+    public OrderEntity(UserEntity user, List<ProductEntity> products, Integer quantity, OrderStatus status) {
+        this.user = user;
+        this.products = products;
+        this.quantity = quantity;
+        this.status = status;
+    }
 }

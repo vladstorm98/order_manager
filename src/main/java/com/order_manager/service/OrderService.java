@@ -4,7 +4,6 @@ import com.order_manager.dto.OrderRequest;
 import com.order_manager.dto.OrderResponse;
 import com.order_manager.entity.OrderEntity;
 import com.order_manager.entity.OrderStatus;
-import com.order_manager.entity.ProductEntity;
 import com.order_manager.entity.UserEntity;
 import com.order_manager.exception.OrderNotFoundException;
 import com.order_manager.exception.UserNotFoundException;
@@ -31,6 +30,26 @@ public class OrderService {
     private final NotificationService notificationService;
     private final OrderMapper orderMapper;
 
+    public OrderResponse createOrder(String username, OrderRequest request) {
+
+        request.products().forEach(product -> {
+            if (productRepository.findById(product.getId()).isEmpty()) {
+                throw new EntityNotFoundException("No valid products found");
+            }
+        });
+
+        UserEntity user = userRepository.findByName(username)
+                .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
+
+        OrderEntity order = new OrderEntity(user, request.products(), request.quantity(), OrderStatus.PENDING);
+
+        OrderResponse response = orderMapper.toResponse(orderRepository.save(order));
+
+        log.info("Order with id #{} was created", response.id());
+        return response;
+    }
+
+    @Transactional
     public List<OrderResponse> getAllOrdersForUser(String username) {
         List<OrderResponse> response = orderRepository.findByUserName(username)
                 .stream()
@@ -38,28 +57,6 @@ public class OrderService {
                 .toList();
 
         log.info("Orders were successfully retrieved");
-        return response;
-    }
-
-    public OrderResponse createOrder(String name, OrderRequest request) {
-        UserEntity user = userRepository.findByName(name)
-                .orElseThrow(() -> new UserNotFoundException("User with username " + name + " not found"));
-
-        List<ProductEntity> products = productRepository.findByIdIn(request.listOfProductId());
-        if (products.isEmpty()) {
-            throw new EntityNotFoundException("No valid products found");
-        }
-
-        OrderEntity order = OrderEntity.builder()
-                .user(user)
-                .products(products)
-                .quantity(request.quantity())
-                .status(OrderStatus.PENDING)
-                .build();
-
-        OrderResponse response = orderMapper.toResponse(orderRepository.save(order));
-
-        log.info("Order with id #{} was created", response.id());
         return response;
     }
 

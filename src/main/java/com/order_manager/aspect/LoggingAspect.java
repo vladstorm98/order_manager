@@ -1,4 +1,4 @@
-package com.order_manager.aspects;
+package com.order_manager.aspect;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -10,14 +10,14 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LoggingAspect {
 
-    @Around("com.order_manager.aspects.Pointcuts.allMethods()")
-    public Object aroundAllMethods(ProceedingJoinPoint joinPoint) throws Throwable {
-        String methodName = joinPoint.getSignature().getName();
+    @Around("com.order_manager.aspect.Pointcuts.allControllerMethods()")
+    public Object aroundAllControllerMethods(ProceedingJoinPoint joinPoint) throws Throwable {
+        var methodName = joinPoint.getSignature().getName();
         log.info("Method {} was launched", methodName);
-        long startTime = System.currentTimeMillis();
+        var startTime = System.currentTimeMillis();
 
         try {
-            Object result = joinPoint.proceed();
+            var result = joinPoint.proceed();
             log.info("Method {} was executed in {} ms", methodName, System.currentTimeMillis() - startTime);
             return result;
         } catch (Throwable e) {

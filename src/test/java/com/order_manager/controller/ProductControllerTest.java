@@ -70,6 +70,7 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.price").value(PRODUCT_PRICE_NEW));
 
         verify(productService, times(1)).createProduct(request);
+        verifyNoMoreInteractions(productService);
     }
 
     @Test
@@ -78,7 +79,7 @@ class ProductControllerTest {
             WHEN fetching all products
             THEN all existing products should be returned with correct details
             """)
-    void shouldReturnAllProducts() throws Exception {
+    void shouldGetAllProducts() throws Exception {
         //GIVEN
         var expectedProducts = prepareProducts();
 
@@ -100,6 +101,7 @@ class ProductControllerTest {
                 );
 
         verify(productService, times(1)).getAllProducts();
+        verifyNoMoreInteractions(productService);
     }
 
     @Test
@@ -108,7 +110,7 @@ class ProductControllerTest {
             WHEN fetching a product
             THEN the product should be returned with correct details
             """)
-    void shouldReturnProductById() throws Exception {
+    void shouldGetProduct() throws Exception {
         //GIVEN
         var expectedProduct = prepareProduct();
 
@@ -127,6 +129,7 @@ class ProductControllerTest {
                 );
 
         verify(productService, times(1)).getProduct(expectedProduct.id());
+        verifyNoMoreInteractions(productService);
     }
 
     @Test
@@ -157,6 +160,7 @@ class ProductControllerTest {
                 );
 
         verify(productService, times(1)).updateProduct(oldProduct.id(), request);
+        verifyNoMoreInteractions(productService);
     }
 
     @Test
@@ -176,6 +180,7 @@ class ProductControllerTest {
                 .andExpect(status().isOk());
 
         verify(productService, times(1)).deleteProduct(product.id());
+        verifyNoMoreInteractions(productService);
     }
 
     private ProductResponse prepareProduct(Long id, String name, BigDecimal price) {

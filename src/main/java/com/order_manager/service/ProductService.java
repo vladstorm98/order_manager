@@ -31,7 +31,7 @@ public class ProductService {
 
     public ProductResponse createProduct(ProductRequest request) {
         ProductResponse response = Optional.ofNullable(productClient.createProduct(request))
-                .orElseThrow(() -> new ProductExistException("Product already exists"));
+                .orElseThrow(() -> new ProductExistException("Product  with name " + request.name() + " already exists"));
 
         log.info("Product with id #{} was created", response.id());
         return response;
@@ -39,7 +39,7 @@ public class ProductService {
 
     public ProductResponse getProduct(@NonNull Long id) {
         ProductResponse response = Optional.ofNullable(productClient.getProduct(id))
-                    .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
+                    .orElseThrow(() -> new ProductNotFoundException("Product with id #" + id + " not found"));
 
         log.info("Product with id #{} was retrieved", id);
         return response;
@@ -47,7 +47,7 @@ public class ProductService {
 
     public ProductResponse updateProduct(@NonNull Long id, ProductRequest request) {
         ProductResponse response = Optional.ofNullable(productClient.updateProduct(id, request))
-                    .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
+                    .orElseThrow(() -> new ProductNotFoundException("Product with id #" + id + " not found"));
 
         log.info("Product with id #{} was updated", id);
         return response;
@@ -56,7 +56,7 @@ public class ProductService {
     public void deleteProduct(@NonNull Long id) {
         Optional.ofNullable(productClient.getProduct(id))
                 .ifPresentOrElse(_ -> productClient.deleteProduct(id), () -> {
-                    throw new ProductNotFoundException("Product with ID " + id + " not found for delete");
+                    throw new ProductNotFoundException("Product with id #" + id + " not found for delete");
                 });
         log.info("Product with id #{} was deleted", id);
     }

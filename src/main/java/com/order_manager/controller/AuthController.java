@@ -1,6 +1,7 @@
 package com.order_manager.controller;
 
 import com.order_manager.dto.AuthResponse;
+import com.order_manager.dto.AuthRequest;
 import com.order_manager.dto.UserRequest;
 import com.order_manager.security.JwtTokenProvider;
 import com.order_manager.service.UserService;
@@ -32,13 +33,13 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "User authorization")
-    public AuthResponse login(@RequestBody UserRequest request) {
+    public AuthResponse login(@RequestBody AuthRequest request) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+                new UsernamePasswordAuthenticationToken(request.name(), request.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String token = jwtTokenProvider.createToken(request.username());
+        String token = jwtTokenProvider.createToken(request.name());
 
         return new AuthResponse(token);
     }

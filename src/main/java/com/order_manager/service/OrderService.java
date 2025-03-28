@@ -8,11 +8,13 @@ import com.order_manager.entity.ProductEntity;
 import com.order_manager.entity.UserEntity;
 import com.order_manager.exception.OrderNotFoundException;
 import com.order_manager.exception.UserNotFoundException;
+import com.order_manager.mapper.OrderMapper;
 import com.order_manager.repository.OrderRepository;
 import com.order_manager.repository.ProductRepository;
 import com.order_manager.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,11 +29,12 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final NotificationService notificationService;
+    private final OrderMapper orderMapper;
 
     public List<OrderResponse> getAllOrdersForUser(String username) {
-        List<OrderResponse> response = orderRepository.findByUserUsername(username)
+        List<OrderResponse> response = orderRepository.findByUserName(username)
                 .stream()
-                .map(this::mapToResponse)
+                .map(orderMapper::toResponse)
                 .toList();
 
         log.info("Orders were successfully retrieved");
@@ -39,7 +42,7 @@ public class OrderService {
     }
 
     public OrderResponse createOrder(String name, OrderRequest request) {
-        UserEntity user = userRepository.findByUsername(name)
+        UserEntity user = userRepository.findByName(name)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + name + " not found"));
 
         List<ProductEntity> products = productRepository.findByIdIn(request.listOfProductId());
@@ -54,27 +57,27 @@ public class OrderService {
                 .status(OrderStatus.PENDING)
                 .build();
 
-        OrderResponse response = mapToResponse(orderRepository.save(order));
+        OrderResponse response = orderMapper.toResponse(orderRepository.save(order));
 
         log.info("Order with id #{} was created", response.id());
         return response;
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(Long id, OrderStatus status) {
+    public OrderResponse updateOrderStatus(@NonNull Long id, OrderStatus status) {
         OrderEntity order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Order with id #" + id + " not found"));
         order.setStatus(status);
 
         notificationService.sendOrderStatusChangeNotification(order.getUser().getEmail(), id, status);
 
-        OrderResponse response = mapToResponse(orderRepository.save(order));
+        OrderResponse response = orderMapper.toResponse(orderRepository.save(order));
 
         log.info("Order with id #{} was updated", id);
         return response;
     }
 
-    public void deleteOrder(Long id) {
+    public void deleteOrder(@NonNull Long id) {
         if (orderRepository.existsById(id)) {
             orderRepository.deleteById(id);
             log.info("Order with id #{} was deleted", id);
@@ -82,9 +85,4 @@ public class OrderService {
             throw new EntityNotFoundException("Order with id #" + id + " not found");
         }
     }
-
-    private OrderResponse mapToResponse(OrderEntity order) {
-        return new OrderResponse(order);
-    }
 }
-

@@ -2,6 +2,8 @@ package com.order_manager.dto;
 
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
+
 public record ProductRequest(
         @NotBlank
         @Size(min = 4, max = 40)
@@ -13,5 +15,5 @@ public record ProductRequest(
         String description,
 
         @Min(0)
-        double price
+        BigDecimal price
 ) {}

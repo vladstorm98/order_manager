@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("JUnit tests for ProductService")
+@DisplayName("Unit tests for ProductService")
 public class ProductServiceTest {
 
     private static final Long PRODUCT_ID_1 = 1L;
@@ -173,7 +173,7 @@ public class ProductServiceTest {
         //GIVEN
         var oldProduct = prepareProduct();
         var request = new ProductRequest(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
-        var updatedProduct = prepareProduct(PRODUCT_ID_NEW, PRODUCT_NAME_NEW, PRODUCT_PRICE_NEW);
+        var updatedProduct = prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_NEW, PRODUCT_PRICE_NEW);
 
         when(productClient.updateProduct(oldProduct.id(), request)).thenReturn(updatedProduct);
 

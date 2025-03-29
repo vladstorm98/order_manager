@@ -25,15 +25,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
-    public List<UserResponse> getAllUsers() {
-        List<UserResponse> response = userRepository.findAll().stream()
-                .map(userMapper::toResponse)
-                .toList();
-
-        log.info("Users was retrieved");
-        return response;
-    }
-
     public UserResponse createUser(UserRequest request) {
         if (userRepository.findByName(request.name()).isPresent()) {
             throw new EntityExistsException("User with name " + request.name() + " already exists");
@@ -45,6 +36,15 @@ public class UserService {
         UserResponse response = userMapper.toResponse(userRepository.save(user));
 
         log.info("User with id #{} was created", response.id());
+        return response;
+    }
+
+    public List<UserResponse> getAllUsers() {
+        List<UserResponse> response = userRepository.findAll().stream()
+                .map(userMapper::toResponse)
+                .toList();
+
+        log.info("Users was retrieved");
         return response;
     }
 

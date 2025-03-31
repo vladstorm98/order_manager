@@ -8,9 +8,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "orders")
 public class OrderEntity {
 
     @Id

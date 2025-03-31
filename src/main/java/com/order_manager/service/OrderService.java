@@ -6,12 +6,12 @@ import com.order_manager.entity.OrderEntity;
 import com.order_manager.entity.OrderStatus;
 import com.order_manager.entity.UserEntity;
 import com.order_manager.exception.OrderNotFoundException;
+import com.order_manager.exception.ProductNotFoundException;
 import com.order_manager.exception.UserNotFoundException;
 import com.order_manager.mapper.OrderMapper;
 import com.order_manager.repository.OrderRepository;
 import com.order_manager.repository.ProductRepository;
 import com.order_manager.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class OrderService {
 
         request.products().forEach(product -> {
             if (productRepository.findById(product.getId()).isEmpty()) {
-                throw new EntityNotFoundException("No valid products found");
+                throw new ProductNotFoundException("No valid products found");
             }
         });
 
@@ -79,7 +79,7 @@ public class OrderService {
             orderRepository.deleteById(id);
             log.info("Order with id #{} was deleted", id);
         } else {
-            throw new EntityNotFoundException("Order with id #" + id + " not found");
+            throw new OrderNotFoundException("Order with id #" + id + " not found");
         }
     }
 }

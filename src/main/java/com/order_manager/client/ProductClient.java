@@ -1,7 +1,7 @@
 package com.order_manager.client;
 
-import com.order_manager.dto.ProductRequest;
-import com.order_manager.dto.ProductResponse;
+import com.order_manager.dto.ProductInput;
+import com.order_manager.dto.ProductDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,16 +11,16 @@ import java.util.List;
 public interface ProductClient {
 
     @GetMapping("/products")
-    List<ProductResponse> getAllProducts();
+    List<ProductDTO> getAllProducts();
 
     @PostMapping("/products")
-    ProductResponse createProduct(@RequestBody ProductRequest request);
+    ProductDTO createProduct(@RequestBody ProductInput request);
 
     @GetMapping("products/{id}")
-    ProductResponse getProduct(@PathVariable Long id);
+    ProductDTO getProduct(@PathVariable Long id);
 
     @PutMapping("/products/{id}")
-    ProductResponse updateProduct(@PathVariable Long id, @RequestBody ProductRequest request);
+    ProductDTO updateProduct(@PathVariable Long id, @RequestBody ProductInput request);
 
     @DeleteMapping("/products/{id}")
     void deleteProduct(@PathVariable Long id);

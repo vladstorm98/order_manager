@@ -1,8 +1,8 @@
 package com.order_manager.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.order_manager.dto.ProductRequest;
-import com.order_manager.dto.ProductResponse;
+import com.order_manager.dto.ProductInput;
+import com.order_manager.dto.ProductDTO;
 import com.order_manager.service.ProductService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,15 +53,15 @@ class ProductControllerTest {
             """)
     void shouldCreateProduct() throws Exception {
         //GIVEN
-        var request = new ProductRequest(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
+        var input = new ProductInput(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
         var createdProduct = prepareProduct(PRODUCT_ID_NEW, PRODUCT_NAME_NEW, PRODUCT_PRICE_NEW);
 
-        when(productService.createProduct(request)).thenReturn(createdProduct);
+        when(productService.createProduct(input)).thenReturn(createdProduct);
 
         //WHEN
         mockMvc.perform(post("/products")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(request)))
+                        .content(mapper.writeValueAsString(input)))
 
                 //THEN
                 .andExpect(status().isOk())
@@ -69,7 +69,7 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.name").value(PRODUCT_NAME_NEW))
                 .andExpect(jsonPath("$.price").value(PRODUCT_PRICE_NEW));
 
-        verify(productService, times(1)).createProduct(request);
+        verify(productService, times(1)).createProduct(input);
         verifyNoMoreInteractions(productService);
     }
 
@@ -141,15 +141,15 @@ class ProductControllerTest {
     void shouldUpdateProduct() throws Exception {
         //GIVEN
         var oldProduct = prepareProduct();
-        var request = new ProductRequest(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
+        var input = new ProductInput(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
         var updatedProduct = prepareProduct(PRODUCT_ID_NEW, PRODUCT_NAME_NEW, PRODUCT_PRICE_NEW);
 
-        when(productService.updateProduct(oldProduct.id(), request)).thenReturn(updatedProduct);
+        when(productService.updateProduct(oldProduct.id(), input)).thenReturn(updatedProduct);
 
         //WHEN
         mockMvc.perform(put("/products/" + oldProduct.id())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(request)))
+                        .content(mapper.writeValueAsString(input)))
 
                 //THEN
                 .andExpectAll(
@@ -159,7 +159,7 @@ class ProductControllerTest {
                         jsonPath("$.price").value(PRODUCT_PRICE_NEW)
                 );
 
-        verify(productService, times(1)).updateProduct(oldProduct.id(), request);
+        verify(productService, times(1)).updateProduct(oldProduct.id(), input);
         verifyNoMoreInteractions(productService);
     }
 
@@ -183,15 +183,15 @@ class ProductControllerTest {
         verifyNoMoreInteractions(productService);
     }
 
-    private ProductResponse prepareProduct(Long id, String name, BigDecimal price) {
-        return new ProductResponse(id, name, price);
+    private ProductDTO prepareProduct(Long id, String name, BigDecimal price) {
+        return new ProductDTO(id, name, price);
     }
 
-    private ProductResponse prepareProduct() {
+    private ProductDTO prepareProduct() {
         return prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_PRICE_1);
     }
 
-    private List<ProductResponse> prepareProducts() {
+    private List<ProductDTO> prepareProducts() {
         return List.of(
                 prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_PRICE_1),
                 prepareProduct(PRODUCT_ID_2, PRODUCT_NAME_2, PRODUCT_PRICE_2)

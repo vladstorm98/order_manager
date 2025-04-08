@@ -1,8 +1,8 @@
 package com.order_manager.service;
 
 import com.order_manager.client.ProductClient;
-import com.order_manager.dto.ProductRequest;
-import com.order_manager.dto.ProductResponse;
+import com.order_manager.dto.ProductInput;
+import com.order_manager.dto.ProductDTO;
 import com.order_manager.exception.ProductExistException;
 import com.order_manager.exception.ProductNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -52,13 +52,13 @@ public class ProductServiceTest {
             """)
     void shouldCreateProduct() {
         //GIVEN
-        var request = new ProductRequest(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
+        var input = new ProductInput(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
         var createdProduct = prepareProduct(PRODUCT_ID_NEW, PRODUCT_NAME_NEW, PRODUCT_PRICE_NEW);
 
-        when(productClient.createProduct(request)).thenReturn(createdProduct);
+        when(productClient.createProduct(input)).thenReturn(createdProduct);
 
         //WHEN
-        var actualProduct = productService.createProduct(request);
+        var actualProduct = productService.createProduct(input);
 
         //THEN
         assertThat(actualProduct).isNotNull()
@@ -68,7 +68,7 @@ public class ProductServiceTest {
                     assertThat(product.price()).isEqualTo(createdProduct.price());
                 });
 
-        verify(productClient, times(1)).createProduct(request);
+        verify(productClient, times(1)).createProduct(input);
         verifyNoMoreInteractions(productClient);
     }
 
@@ -80,15 +80,15 @@ public class ProductServiceTest {
             """)
     void shouldThrowException_whenProductExists() {
         //GIVEN
-        var request = new ProductRequest(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
+        var input = new ProductInput(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
 
         //WHEN
-        when(productClient.createProduct(request)).thenReturn(null);
+        when(productClient.createProduct(input)).thenReturn(null);
 
         //THEN
-        assertThatThrownBy(() -> productService.createProduct(request))
+        assertThatThrownBy(() -> productService.createProduct(input))
                 .isInstanceOf(ProductExistException.class)
-                .hasMessageContaining("Product  with name " + request.name() + " already exists");
+                .hasMessageContaining("Product  with name " + input.name() + " already exists");
     }
 
     @Test
@@ -149,7 +149,7 @@ public class ProductServiceTest {
         when(productClient.getProduct(expectedProduct.id())).thenReturn(expectedProduct);
 
         //WHEN
-        ProductResponse actualProduct = productService.getProduct(expectedProduct.id());
+        ProductDTO actualProduct = productService.getProduct(expectedProduct.id());
 
         //THEN
         assertThat(actualProduct).isNotNull()
@@ -172,13 +172,13 @@ public class ProductServiceTest {
     void shouldUpdateProduct() {
         //GIVEN
         var oldProduct = prepareProduct();
-        var request = new ProductRequest(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
+        var input = new ProductInput(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
         var updatedProduct = prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_NEW, PRODUCT_PRICE_NEW);
 
-        when(productClient.updateProduct(oldProduct.id(), request)).thenReturn(updatedProduct);
+        when(productClient.updateProduct(oldProduct.id(), input)).thenReturn(updatedProduct);
 
         //WHEN
-        ProductResponse actualProduct = productService.updateProduct(oldProduct.id(), request);
+        ProductDTO actualProduct = productService.updateProduct(oldProduct.id(), input);
 
         //THEN
         assertThat(actualProduct).isNotNull()
@@ -188,7 +188,7 @@ public class ProductServiceTest {
                     assertThat(product.price()).isEqualTo(updatedProduct.price());
                 });
 
-        verify(productClient).updateProduct(oldProduct.id(), request);
+        verify(productClient).updateProduct(oldProduct.id(), input);
         verifyNoMoreInteractions(productClient);
     }
 
@@ -231,15 +231,15 @@ public class ProductServiceTest {
                 .hasMessageContaining("Product with id #" + product.id() + " not found");
     }
 
-    private ProductResponse prepareProduct(Long id, String name, BigDecimal price) {
-        return new ProductResponse(id, name, price);
+    private ProductDTO prepareProduct(Long id, String name, BigDecimal price) {
+        return new ProductDTO(id, name, price);
     }
 
-    private ProductResponse prepareProduct() {
+    private ProductDTO prepareProduct() {
         return prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_PRICE_1);
     }
 
-    private List<ProductResponse> prepareProducts() {
+    private List<ProductDTO> prepareProducts() {
         return List.of(
                 prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_PRICE_1),
                 prepareProduct(PRODUCT_ID_2, PRODUCT_NAME_2, PRODUCT_PRICE_2)

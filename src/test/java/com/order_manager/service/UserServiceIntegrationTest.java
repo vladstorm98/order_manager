@@ -1,8 +1,8 @@
 package com.order_manager.service;
 
 import com.order_manager.BaseTest;
-import com.order_manager.dto.UserRequest;
-import com.order_manager.dto.UserResponse;
+import com.order_manager.dto.UserInput;
+import com.order_manager.dto.UserDTO;
 import com.order_manager.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,16 +37,16 @@ public class UserServiceIntegrationTest extends BaseTest {
             """)
     void shouldCreateUser() {
         // GIVEN
-        var request = new UserRequest(USER_NAME_NEW, USER_PASSWORD_NEW, USER_EMAIL_NEW);
+        var input = new UserInput(USER_NAME_NEW, USER_PASSWORD_NEW, USER_EMAIL_NEW);
 
         // WHEN
-        var createdUser = userService.createUser(request);
+        var createdUser = userService.createUser(input);
 
         // THEN
         assertThat(createdUser).isNotNull()
                 .satisfies(user -> {
-                    assertThat(user.name()).isEqualTo(request.name());
-                    assertThat(user.email()).isEqualTo(request.email());
+                    assertThat(user.name()).isEqualTo(input.name());
+                    assertThat(user.email()).isEqualTo(input.email());
         });
 
         assertThat(userRepository.findByName(USER_NAME_NEW)).isPresent();
@@ -113,17 +113,17 @@ public class UserServiceIntegrationTest extends BaseTest {
         void shouldUpdateUser() {
             // GIVEN
             var oldUser = prepareUser();
-            var request = new UserRequest(USER_NAME_NEW, USER_PASSWORD_NEW, USER_EMAIL_NEW);
+            var input = new UserInput(USER_NAME_NEW, USER_PASSWORD_NEW, USER_EMAIL_NEW);
 
             // WHEN
-            var updatedUser = userService.updateUser(oldUser.id(), request);
+            var updatedUser = userService.updateUser(oldUser.id(), input);
 
             // THEN
             assertThat(updatedUser).isNotNull()
                     .satisfies(user -> {
                             assertThat(user.id()).isEqualTo(oldUser.id());
-                            assertThat(user.name()).isEqualTo(request.name());
-                            assertThat(user.email()).isEqualTo(request.email());
+                            assertThat(user.name()).isEqualTo(input.name());
+                            assertThat(user.email()).isEqualTo(input.email());
             });
 
             assertThat(userRepository.findById(oldUser.id())).isPresent();
@@ -147,15 +147,15 @@ public class UserServiceIntegrationTest extends BaseTest {
         }
     }
 
-    private UserResponse prepareUser(Long id, String name, String email) {
-        return new UserResponse(id, name, email);
+    private UserDTO prepareUser(Long id, String name, String email) {
+        return new UserDTO(id, name, email);
     }
 
-    private UserResponse prepareUser() {
+    private UserDTO prepareUser() {
         return prepareUser(USER_ID_1, USER_NAME_1, USER_EMAIL_1);
     }
 
-    private List<UserResponse> prepareUsers() {
+    private List<UserDTO> prepareUsers() {
         return List.of(
                 prepareUser(USER_ID_1, USER_NAME_1, USER_EMAIL_1),
                 prepareUser(USER_ID_2, USER_NAME_2, USER_EMAIL_2)

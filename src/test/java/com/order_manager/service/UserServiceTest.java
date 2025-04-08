@@ -1,7 +1,7 @@
 package com.order_manager.service;
 
-import com.order_manager.dto.UserRequest;
-import com.order_manager.dto.UserResponse;
+import com.order_manager.dto.UserDTO;
+import com.order_manager.dto.UserInput;
 import com.order_manager.entity.UserEntity;
 import com.order_manager.entity.UserRole;
 import com.order_manager.mapper.UserMapper;
@@ -52,34 +52,34 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN User request
+            GIVEN User input
             WHEN Creating a new user
             THEN Created user should be returned with correct data
             """)
     void shouldCreateUser() {
         // GIVEN
-        var request = new UserRequest(USER_NAME_NEW, USER_PASSWORD, USER_EMAIL_NEW);
+        var input = new UserInput(USER_NAME_NEW, USER_PASSWORD, USER_EMAIL_NEW);
         var userEntity = buildEntity(USER_ID_NEW, USER_NAME_NEW, USER_EMAIL_NEW);
         var createdUser = buildResponse(USER_ID_NEW, USER_NAME_NEW, USER_EMAIL_NEW);
 
-        when(userRepository.findByName(request.name())).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(request.password())).thenReturn(USER_PASSWORD);
-        when(userMapper.toResponse(any())).thenReturn(createdUser);
+        when(userRepository.findByName(input.name())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(input.password())).thenReturn(USER_PASSWORD);
+        when(userMapper.dbToDto(any())).thenReturn(createdUser);
         when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 
         // WHEN
-        var actualUser = userService.createUser(request);
+        var actualUser = userService.createUser(input);
 
         // THEN
         assertThat(actualUser).isNotNull()
                 .satisfies(user -> {
-                    assertThat(user.name()).isEqualTo(request.name());
-                    assertThat(user.email()).isEqualTo(request.email());
+                    assertThat(user.name()).isEqualTo(input.name());
+                    assertThat(user.email()).isEqualTo(input.email());
                 });
 
-        verify(userRepository, times(1)).findByName(request.name());
-        verify(passwordEncoder, times(1)).encode(request.password());
-        verify(userMapper, times(1)).toResponse(any());
+        verify(userRepository, times(1)).findByName(input.name());
+        verify(passwordEncoder, times(1)).encode(input.password());
+        verify(userMapper, times(1)).dbToDto(any());
         verify(userRepository, times(1)).save(any(UserEntity.class));
         verifyNoMoreInteractions(userRepository, passwordEncoder, userMapper);
     }
@@ -98,8 +98,8 @@ public class UserServiceTest {
         var userEntities = buildEntities();
 
         when(userRepository.findAll()).thenReturn(userEntities);
-        when(userMapper.toResponse(userEntities.get(0))).thenReturn(expectedUsers.get(0));
-        when(userMapper.toResponse(userEntities.get(1))).thenReturn(expectedUsers.get(1));
+        when(userMapper.dbToDto(userEntities.get(0))).thenReturn(expectedUsers.get(0));
+        when(userMapper.dbToDto(userEntities.get(1))).thenReturn(expectedUsers.get(1));
 
         // WHEN
         var actualUsers = userService.getAllUsers();
@@ -117,7 +117,7 @@ public class UserServiceTest {
                 });
 
         verify(userRepository, times(1)).findAll();
-        verify(userMapper, times(expectedUsers.size())).toResponse(any());
+        verify(userMapper, times(expectedUsers.size())).dbToDto(any());
         verifyNoMoreInteractions(userRepository, userMapper);
     }
 
@@ -133,7 +133,7 @@ public class UserServiceTest {
         var userEntity = buildEntity();
 
         when(userRepository.findById(expectedUser.id())).thenReturn(Optional.of(userEntity));
-        when(userMapper.toResponse(userEntity)).thenReturn(expectedUser);
+        when(userMapper.dbToDto(userEntity)).thenReturn(expectedUser);
 
         // WHEN
         var actualUser = userService.getUserById(expectedUser.id());
@@ -147,42 +147,42 @@ public class UserServiceTest {
                 });
 
         verify(userRepository, times(1)).findById(expectedUser.id());
-        verify(userMapper, times(1)).toResponse(any());
+        verify(userMapper, times(1)).dbToDto(any());
         verifyNoMoreInteractions(userRepository, userMapper);
     }
 
     @Test
     @DisplayName("""
-        GIVEN Existing user and a user request
+        GIVEN Existing user and a user input
         WHEN Updating the user
         THEN Updated user should be updated with new values
         """)
     void shouldUpdateUser() {
         // GIVEN
         var oldUser = buildEntity();
-        var request = new UserRequest(USER_NAME_NEW, USER_PASSWORD, USER_EMAIL_NEW);
+        var input = new UserInput(USER_NAME_NEW, USER_PASSWORD, USER_EMAIL_NEW);
         var userEntity = buildEntity(USER_ID_1, USER_NAME_NEW, USER_EMAIL_NEW);
         var updatedUser = buildResponse(USER_ID_1, USER_NAME_NEW, USER_EMAIL_NEW);
 
         when(userRepository.findById(oldUser.getId())).thenReturn(Optional.of(oldUser));
-        when(passwordEncoder.encode(request.password())).thenReturn(USER_PASSWORD);
-        when(userMapper.toResponse(any())).thenReturn(updatedUser);
+        when(passwordEncoder.encode(input.password())).thenReturn(USER_PASSWORD);
+        when(userMapper.dbToDto(any())).thenReturn(updatedUser);
         when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 
         // WHEN
-        var actualUser = userService.updateUser(oldUser.getId(), request);
+        var actualUser = userService.updateUser(oldUser.getId(), input);
 
         // THEN
         assertThat(actualUser).isNotNull()
                 .satisfies(user -> {
                     assertThat(user.id()).isEqualTo(oldUser.getId());
-                    assertThat(user.name()).isEqualTo(request.name());
-                    assertThat(user.email()).isEqualTo(request.email());
+                    assertThat(user.name()).isEqualTo(input.name());
+                    assertThat(user.email()).isEqualTo(input.email());
                 });
 
         verify(userRepository, times(1)).findById(oldUser.getId());
-        verify(passwordEncoder, times(1)).encode(request.password());
-        verify(userMapper, times(1)).toResponse(any());
+        verify(passwordEncoder, times(1)).encode(input.password());
+        verify(userMapper, times(1)).dbToDto(any());
         verify(userRepository, times(1)).save(any(UserEntity.class));
         verifyNoMoreInteractions(userRepository, passwordEncoder, userMapper);
     }
@@ -224,15 +224,15 @@ public class UserServiceTest {
         );
     }
 
-    private UserResponse buildResponse(Long id, String name, String email) {
-        return new UserResponse(id, name, email);
+    private UserDTO buildResponse(Long id, String name, String email) {
+        return new UserDTO(id, name, email);
     }
 
-    private UserResponse buildResponse() {
+    private UserDTO buildResponse() {
         return buildResponse(USER_ID_1, USER_NAME_1, USER_EMAIL_1);
     }
 
-    private List<UserResponse> buildResponses() {
+    private List<UserDTO> buildResponses() {
         return List.of(
                 buildResponse(USER_ID_1, USER_NAME_1, USER_EMAIL_1),
                 buildResponse(USER_ID_2, USER_NAME_2, USER_EMAIL_2)

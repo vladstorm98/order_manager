@@ -1,7 +1,7 @@
 package com.order_manager.service;
 
-import com.order_manager.dto.OrderRequest;
-import com.order_manager.dto.OrderResponse;
+import com.order_manager.dto.OrderDTO;
+import com.order_manager.dto.OrderInput;
 import com.order_manager.entity.*;
 import com.order_manager.exception.OrderNotFoundException;
 import com.order_manager.exception.ProductNotFoundException;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("Unit tests for OrderService")
 public class OrderServiceTest {
 
-    private static final String USER_NAME = "Name 1";
+    private static final String USER_NAME = "Name";
     private static final String USER_PASSWORD = "Password";
     private static final UserRole USER_ROLE = UserRole.USER;
     private static final String USER_EMAIL = "email@example.com";
@@ -74,18 +74,18 @@ public class OrderServiceTest {
         //GIVEN
         var user = prepareUser();
         var products = prepareProducts();
-        var request = new OrderRequest(products, ORDER_QUANTITY);
+        var input = new OrderInput(products, ORDER_QUANTITY);
         var orderEntity = buildEntity();
         var expectedOrder = buildResponse(ORDER_ID_NEW, ORDER_STATUS, products);
 
-        when(productRepository.findById(products.get(0).getId())).thenReturn(Optional.of(products.get(0)));
-        when(productRepository.findById(products.get(1).getId())).thenReturn(Optional.of(products.get(1)));
+        when(productRepository.findById(products.getFirst().getId())).thenReturn(Optional.of(products.getFirst()));
+        when(productRepository.findById(products.getLast().getId())).thenReturn(Optional.of(products.getLast()));
         when(userRepository.findByName(USER_NAME)).thenReturn(Optional.of(user));
         when(orderRepository.save(any(OrderEntity.class))).thenReturn(orderEntity);
-        when(orderMapper.toResponse(orderEntity)).thenReturn(expectedOrder);
+        when(orderMapper.dbToDto(orderEntity)).thenReturn(expectedOrder);
 
         //WHEN
-        var actualOrder = orderService.createOrder(user.getName(), request);
+        var actualOrder = orderService.createOrder(user.getName(), input);
 
         //THEN
         assertThat(actualOrder).isNotNull()
@@ -99,7 +99,7 @@ public class OrderServiceTest {
 
         verify(productRepository, times(products.size())).findById(any());
         verify(userRepository, times(1)).findByName(USER_NAME);
-        verify(orderMapper, times(1)).toResponse(orderEntity);
+        verify(orderMapper, times(1)).dbToDto(orderEntity);
         verify(orderRepository, times(1)).save(any(OrderEntity.class));
         verifyNoMoreInteractions(productRepository, userRepository, orderRepository, orderMapper);
     }
@@ -112,13 +112,13 @@ public class OrderServiceTest {
             """)
     void shouldThrowException_whenProductsNotFound() {
         //GIVEN
-        var request = new OrderRequest(prepareProducts(), ORDER_QUANTITY);
+        var input = new OrderInput(prepareProducts(), ORDER_QUANTITY);
 
         //WHEN
         when(productRepository.findById(anyLong())).thenAnswer(_ -> Optional.empty());
 
         //THEN
-        assertThatThrownBy(() -> orderService.createOrder(USER_NAME, request))
+        assertThatThrownBy(() -> orderService.createOrder(USER_NAME, input))
                 .isInstanceOf(ProductNotFoundException.class)
                 .hasMessageContaining("No valid products found");
     }
@@ -131,7 +131,7 @@ public class OrderServiceTest {
             """)
     void shouldThrowException_whenUserNotFound() {
         //GIVEN
-        var request = new OrderRequest(prepareProducts(), ORDER_QUANTITY);
+        var input = new OrderInput(prepareProducts(), ORDER_QUANTITY);
 
         when(productRepository.findById(anyLong())).thenAnswer(_ -> Optional.of(mock(ProductEntity.class)));
 
@@ -139,7 +139,7 @@ public class OrderServiceTest {
         when(userRepository.findByName(USER_NAME)).thenReturn(Optional.empty());
 
         //THEN
-        assertThatThrownBy(() -> orderService.createOrder(USER_NAME, request))
+        assertThatThrownBy(() -> orderService.createOrder(USER_NAME, input))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessageContaining("User with username " + USER_NAME + " not found");
     }
@@ -156,8 +156,8 @@ public class OrderServiceTest {
         var expectedOrders = buildResponses();
 
         when(orderRepository.findByUserName(USER_NAME)).thenReturn(orderEntities);
-        when(orderMapper.toResponse(orderEntities.get(0))).thenReturn(expectedOrders.get(0));
-        when(orderMapper.toResponse(orderEntities.get(1))).thenReturn(expectedOrders.get(1));
+        when(orderMapper.dbToDto(orderEntities.getFirst())).thenReturn(expectedOrders.getFirst());
+        when(orderMapper.dbToDto(orderEntities.getLast())).thenReturn(expectedOrders.getLast());
 
         //WHEN
         var actualOrders = orderService.getAllOrdersForUser(USER_NAME);
@@ -180,7 +180,7 @@ public class OrderServiceTest {
                 });
 
         verify(orderRepository, times(1)).findByUserName(USER_NAME);
-        verify(orderMapper, times(orderEntities.size())).toResponse(any());
+        verify(orderMapper, times(orderEntities.size())).dbToDto(any());
         verifyNoMoreInteractions(orderRepository, orderMapper);
     }
 
@@ -197,7 +197,7 @@ public class OrderServiceTest {
 
         when(orderRepository.findById(orderEntity.getId())).thenReturn(Optional.of(orderEntity));
         when(orderRepository.save(orderEntity)).thenReturn(orderEntity);
-        when(orderMapper.toResponse(orderEntity)).thenReturn(expectedOrder);
+        when(orderMapper.dbToDto(orderEntity)).thenReturn(expectedOrder);
 
         //WHEN
         var actualOrder = orderService.updateOrderStatus(orderEntity.getId(), ORDER_STATUS_NEW);
@@ -217,7 +217,7 @@ public class OrderServiceTest {
 
         verify(orderRepository, times(1)).findById(orderEntity.getId());
         verify(orderRepository, times(1)).save(orderEntity);
-        verify(orderMapper, times(1)).toResponse(orderEntity);
+        verify(orderMapper, times(1)).dbToDto(orderEntity);
         verify(notificationService, times(1))
                 .sendOrderStatusChangeNotification(orderEntity.getUser().getEmail(), orderEntity.getId(), ORDER_STATUS_NEW);
         verifyNoMoreInteractions(orderRepository, orderMapper, notificationService);
@@ -300,11 +300,11 @@ public class OrderServiceTest {
                 buildEntity(ORDER_ID_2, prepareUser(), prepareProducts()));
     }
 
-    private OrderResponse buildResponse(Long id, OrderStatus status, List<ProductEntity> products) {
-        return new OrderResponse(id, status, products);
+    private OrderDTO buildResponse(Long id, OrderStatus status, List<ProductEntity> products) {
+        return new OrderDTO(id, status, products);
     }
 
-    private List<OrderResponse> buildResponses() {
+    private List<OrderDTO> buildResponses() {
         return List.of(
                 buildResponse(ORDER_ID_1, ORDER_STATUS, prepareProducts()),
                 buildResponse(ORDER_ID_2, ORDER_STATUS, prepareProducts())

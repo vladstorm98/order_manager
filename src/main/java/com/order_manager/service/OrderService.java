@@ -1,7 +1,7 @@
 package com.order_manager.service;
 
-import com.order_manager.dto.OrderRequest;
-import com.order_manager.dto.OrderResponse;
+import com.order_manager.dto.OrderDTO;
+import com.order_manager.dto.OrderInput;
 import com.order_manager.entity.OrderEntity;
 import com.order_manager.entity.OrderStatus;
 import com.order_manager.entity.UserEntity;
@@ -30,9 +30,9 @@ public class OrderService {
     private final NotificationService notificationService;
     private final OrderMapper orderMapper;
 
-    public OrderResponse createOrder(String username, OrderRequest request) {
+    public OrderDTO createOrder(String username, OrderInput input) {
 
-        request.products().forEach(product -> {
+        input.products().forEach(product -> {
             if (productRepository.findById(product.getId()).isEmpty()) {
                 throw new ProductNotFoundException("No valid products found");
             }
@@ -41,19 +41,19 @@ public class OrderService {
         UserEntity user = userRepository.findByName(username)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
 
-        OrderEntity order = new OrderEntity(user, request.products(), request.quantity(), OrderStatus.PENDING);
+        OrderEntity order = new OrderEntity(user, input.products(), input.quantity(), OrderStatus.PENDING);
 
-        OrderResponse response = orderMapper.toResponse(orderRepository.save(order));
+        OrderDTO response = orderMapper.dbToDto(orderRepository.save(order));
 
         log.info("Order with id #{} was created", response.id());
         return response;
     }
 
     @Transactional
-    public List<OrderResponse> getAllOrdersForUser(String username) {
-        List<OrderResponse> response = orderRepository.findByUserName(username)
+    public List<OrderDTO> getAllOrdersForUser(String username) {
+        List<OrderDTO> response = orderRepository.findByUserName(username)
                 .stream()
-                .map(orderMapper::toResponse)
+                .map(orderMapper::dbToDto)
                 .toList();
 
         log.info("Orders were successfully retrieved");
@@ -61,14 +61,14 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(@NonNull Long id, OrderStatus status) {
+    public OrderDTO updateOrderStatus(@NonNull Long id, OrderStatus status) {
         OrderEntity order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Order with id #" + id + " not found"));
         order.setStatus(status);
 
         notificationService.sendOrderStatusChangeNotification(order.getUser().getEmail(), id, status);
 
-        OrderResponse response = orderMapper.toResponse(orderRepository.save(order));
+        OrderDTO response = orderMapper.dbToDto(orderRepository.save(order));
 
         log.info("Order with id #{} was updated", id);
         return response;

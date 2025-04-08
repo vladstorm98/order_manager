@@ -1,7 +1,7 @@
 package com.order_manager.controller;
 
-import com.order_manager.dto.UserRequest;
-import com.order_manager.dto.UserResponse;
+import com.order_manager.dto.UserDTO;
+import com.order_manager.dto.UserInput;
 import com.order_manager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,20 +18,20 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @Operation(summary ="Get user by ID")
-    public UserResponse getUser(@PathVariable Long userId) {
+    public UserDTO getUser(@PathVariable Long userId) {
         return userService.getUserById(userId);
     }
 
     @PostMapping
     @Operation(summary = "Create a new user")
-    public UserResponse createUser(@RequestBody UserRequest request) {
-        return userService.createUser(request);
+    public UserDTO createUser(@RequestBody UserInput input) {
+        return userService.createUser(input);
     }
 
     @PutMapping("/{userId}")
     @Operation(summary = "Update user by ID")
-    public UserResponse updateUser(@PathVariable Long userId, @RequestBody UserRequest request) {
-        return userService.updateUser(userId, request);
+    public UserDTO updateUser(@PathVariable Long userId, @RequestBody UserInput input) {
+        return userService.updateUser(userId, input);
     }
 
     @DeleteMapping("/{userId}")

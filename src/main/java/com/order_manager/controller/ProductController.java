@@ -1,7 +1,7 @@
 package com.order_manager.controller;
 
-import com.order_manager.dto.ProductRequest;
-import com.order_manager.dto.ProductResponse;
+import com.order_manager.dto.ProductInput;
+import com.order_manager.dto.ProductDTO;
 import com.order_manager.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,26 +20,26 @@ public class ProductController {
 
     @GetMapping
     @Operation(summary = "Get the list of all product")
-    public List<ProductResponse> getAllProducts() {
+    public List<ProductDTO> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get information about product by ID")
-    public ProductResponse getProduct(@PathVariable Long id) {
+    public ProductDTO getProduct(@PathVariable Long id) {
         return productService.getProduct(id);
     }
 
     @PostMapping
     @Operation(summary = "Create a new product")
-    public ProductResponse createProduct(@RequestBody ProductRequest request) {
-        return productService.createProduct(request);
+    public ProductDTO createProduct(@RequestBody ProductInput input) {
+        return productService.createProduct(input);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update information about product by ID")
-    public ProductResponse updateProduct(@PathVariable Long id, @RequestBody ProductRequest request) {
-        return productService.updateProduct(id, request);
+    public ProductDTO updateProduct(@PathVariable Long id, @RequestBody ProductInput input) {
+        return productService.updateProduct(id, input);
     }
 
     @DeleteMapping("/{id}")

@@ -1,4 +1,4 @@
 package com.order_manager.dto;
 
-public interface ResponseDTO {
+public interface DTO {
 }

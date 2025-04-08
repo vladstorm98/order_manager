@@ -1,11 +1,13 @@
 package com.order_manager.mapper;
 
-import com.order_manager.dto.OrderResponse;
+import com.order_manager.dto.OrderDTO;
 import com.order_manager.entity.OrderEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface OrderMapper {
-    OrderResponse toResponse(OrderEntity order);
+    OrderDTO dbToDto(OrderEntity order);
 }

@@ -1,8 +1,8 @@
 package com.order_manager.service;
 
 import com.order_manager.client.ProductClient;
-import com.order_manager.dto.ProductRequest;
-import com.order_manager.dto.ProductResponse;
+import com.order_manager.dto.ProductInput;
+import com.order_manager.dto.ProductDTO;
 import com.order_manager.exception.ProductExistException;
 import com.order_manager.exception.ProductNotFoundException;
 import lombok.NonNull;
@@ -20,8 +20,8 @@ public class ProductService {
 
     private final ProductClient productClient;
 
-    public List<ProductResponse> getAllProducts() {
-        List<ProductResponse> response = Optional.ofNullable(productClient.getAllProducts())
+    public List<ProductDTO> getAllProducts() {
+        List<ProductDTO> response = Optional.ofNullable(productClient.getAllProducts())
                     .filter(products -> !products.isEmpty())
                     .orElseThrow(() -> new ProductNotFoundException("Products not found"));
 
@@ -29,24 +29,24 @@ public class ProductService {
         return response;
     }
 
-    public ProductResponse createProduct(ProductRequest request) {
-        ProductResponse response = Optional.ofNullable(productClient.createProduct(request))
-                .orElseThrow(() -> new ProductExistException("Product  with name " + request.name() + " already exists"));
+    public ProductDTO createProduct(ProductInput input) {
+        ProductDTO response = Optional.ofNullable(productClient.createProduct(input))
+                .orElseThrow(() -> new ProductExistException("Product  with name " + input.name() + " already exists"));
 
         log.info("Product with id #{} was created", response.id());
         return response;
     }
 
-    public ProductResponse getProduct(@NonNull Long id) {
-        ProductResponse response = Optional.ofNullable(productClient.getProduct(id))
+    public ProductDTO getProduct(@NonNull Long id) {
+        ProductDTO response = Optional.ofNullable(productClient.getProduct(id))
                     .orElseThrow(() -> new ProductNotFoundException("Product with id #" + id + " not found"));
 
         log.info("Product with id #{} was retrieved", id);
         return response;
     }
 
-    public ProductResponse updateProduct(@NonNull Long id, ProductRequest request) {
-        ProductResponse response = Optional.ofNullable(productClient.updateProduct(id, request))
+    public ProductDTO updateProduct(@NonNull Long id, ProductInput input) {
+        ProductDTO response = Optional.ofNullable(productClient.updateProduct(id, input))
                     .orElseThrow(() -> new ProductNotFoundException("Product with id #" + id + " not found"));
 
         log.info("Product with id #{} was updated", id);

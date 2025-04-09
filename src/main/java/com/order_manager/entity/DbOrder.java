@@ -10,8 +10,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Table(name = "orders")
-public class OrderEntity {
+public class DbOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +20,7 @@ public class OrderEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+    private DbUser user;
 
     @ManyToMany
     @JoinTable(
@@ -27,14 +28,14 @@ public class OrderEntity {
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    private List<ProductEntity> products = new ArrayList<>();
+    private List<DbProduct> products = new ArrayList<>();
 
     private Integer quantity;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    public OrderEntity(UserEntity user, List<ProductEntity> products, Integer quantity, OrderStatus status) {
+    public DbOrder(DbUser user, List<DbProduct> products, Integer quantity, OrderStatus status) {
         this.user = user;
         this.products = products;
         this.quantity = quantity;

@@ -46,9 +46,9 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN a product request
-            WHEN creating a new product
-            THEN the created product should be returned with correct details
+            GIVEN Input for creating a new product
+            WHEN Creating a new product
+            THEN Created product should be returned with correct details
             """)
     void shouldCreateProduct() {
         //GIVEN
@@ -74,9 +74,9 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN a product request
-            WHEN the product already exists
-            THEN a ProductExistException should be thrown
+            GIVEN Input for creating a new product
+            WHEN Product already exists
+            THEN ProductExistException should be thrown
             """)
     void shouldThrowException_whenProductExists() {
         //GIVEN
@@ -93,9 +93,9 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN the existing products
-            WHEN fetching all products
-            THEN all existing products should be returned with correct details
+            GIVEN Existing products
+            WHEN Fetching all products
+            THEN All existing products should be returned with correct details
             """)
     void shouldGetAllProducts() {
         //GIVEN
@@ -123,8 +123,8 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            WHEN fetching empty list of products
-            THEN a ProductNotFoundException should be thrown
+            WHEN Fetching empty list of products
+            THEN ProductNotFoundException should be thrown
             """)
     void shouldThrowException_whenAllProductsNotFound() {
         //WHEN
@@ -138,9 +138,9 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN the existing product
-            WHEN fetching a product
-            THEN the existing product should be returned with correct details
+            GIVEN Existing product
+            WHEN Fetching a product
+            THEN Existing product should be returned with correct details
             """)
     void shouldGetProduct() {
         //GIVEN
@@ -165,9 +165,9 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN the existing product
-            WHEN update a product
-            THEN the product should be updated and returned with correct details
+            GIVEN Existing product
+            WHEN Updating a product
+            THEN Product should be updated and returned with correct details
             """)
     void shouldUpdateProduct() {
         //GIVEN
@@ -194,9 +194,9 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN the existing product
-            WHEN deleting a product
-            THEN the product should be deleted
+            GIVEN Existing product
+            WHEN Deleting a product
+            THEN Product should be deleted
             """)
     void shouldDeleteProduct() {
         //GIVEN
@@ -214,9 +214,9 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN the existing product
-            WHEN the product doesn't exist
-            THEN a ProductNotFoundException should be thrown
+            GIVEN Existing product
+            WHEN Product doesn't exist
+            THEN ProductNotFoundException should be thrown
             """)
     void shouldThrowException_whenProductNotFound() {
         //GIVEN

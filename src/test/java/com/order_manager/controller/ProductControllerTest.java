@@ -47,7 +47,7 @@ class ProductControllerTest {
 
     @Test
     @DisplayName("""
-            GIVEN a product request
+            GIVEN a product input
             WHEN creating a new product
             THEN the created product should be returned with correct details
             """)

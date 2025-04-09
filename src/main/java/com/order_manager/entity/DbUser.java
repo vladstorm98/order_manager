@@ -9,8 +9,9 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Table(name = "users")
-public class UserEntity {
+public class DbUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +30,7 @@ public class UserEntity {
     @Email
     private String email;
 
-    public UserEntity(String username, String password, UserRole role, String email) {
+    public DbUser(String username, String password, UserRole role, String email) {
         this.name = username;
         this.password = password;
         this.role = role;

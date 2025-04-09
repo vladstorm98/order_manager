@@ -66,7 +66,7 @@ public class OrderServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN Request for creating a new order
+            GIVEN Input for creating a new order
             WHEN Creating a new order
             THEN Created order should be returned with correct data
             """)
@@ -81,7 +81,7 @@ public class OrderServiceTest {
         when(productRepository.findById(products.getFirst().getId())).thenReturn(Optional.of(products.getFirst()));
         when(productRepository.findById(products.getLast().getId())).thenReturn(Optional.of(products.getLast()));
         when(userRepository.findByName(USER_NAME)).thenReturn(Optional.of(user));
-        when(orderRepository.save(any(OrderEntity.class))).thenReturn(orderEntity);
+        when(orderRepository.save(any(DbOrder.class))).thenReturn(orderEntity);
         when(orderMapper.dbToDto(orderEntity)).thenReturn(expectedOrder);
 
         //WHEN
@@ -100,13 +100,13 @@ public class OrderServiceTest {
         verify(productRepository, times(products.size())).findById(any());
         verify(userRepository, times(1)).findByName(USER_NAME);
         verify(orderMapper, times(1)).dbToDto(orderEntity);
-        verify(orderRepository, times(1)).save(any(OrderEntity.class));
+        verify(orderRepository, times(1)).save(any(DbOrder.class));
         verifyNoMoreInteractions(productRepository, userRepository, orderRepository, orderMapper);
     }
 
     @Test
     @DisplayName("""
-            GIVEN Request for creating order
+            GIVEN Input for creating order
             WHEN Products don't exist
             THEN Should throw an exception
             """)
@@ -125,7 +125,7 @@ public class OrderServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN Request for creating order
+            GIVEN Input for creating order
             WHEN User doesn't exist
             THEN Should throw an exception
             """)
@@ -133,7 +133,7 @@ public class OrderServiceTest {
         //GIVEN
         var input = new OrderInput(prepareProducts(), ORDER_QUANTITY);
 
-        when(productRepository.findById(anyLong())).thenAnswer(_ -> Optional.of(mock(ProductEntity.class)));
+        when(productRepository.findById(anyLong())).thenAnswer(_ -> Optional.of(mock(DbProduct.class)));
 
         //WHEN
         when(userRepository.findByName(USER_NAME)).thenReturn(Optional.empty());
@@ -275,32 +275,32 @@ public class OrderServiceTest {
                 .hasMessageContaining("Order with id #" + ORDER_ID_1 + " not found");
     }
 
-    private UserEntity prepareUser() {
-        return new UserEntity(USER_NAME, USER_PASSWORD, USER_ROLE, USER_EMAIL);
+    private DbUser prepareUser() {
+        return new DbUser(USER_NAME, USER_PASSWORD, USER_ROLE, USER_EMAIL);
     }
 
-    private List<ProductEntity> prepareProducts() {
+    private List<DbProduct> prepareProducts() {
         return List.of(
-                new ProductEntity(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_DESCRIPTION, PRODUCT_PRICE_1),
-                new ProductEntity(PRODUCT_ID_2, PRODUCT_NAME_2, PRODUCT_DESCRIPTION, PRODUCT_PRICE_2)
+                new DbProduct(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_DESCRIPTION, PRODUCT_PRICE_1),
+                new DbProduct(PRODUCT_ID_2, PRODUCT_NAME_2, PRODUCT_DESCRIPTION, PRODUCT_PRICE_2)
         );
     }
 
-    private OrderEntity buildEntity(Long id, UserEntity user, List<ProductEntity> products) {
-        return new OrderEntity(id, user, products, ORDER_QUANTITY, ORDER_STATUS);
+    private DbOrder buildEntity(Long id, DbUser user, List<DbProduct> products) {
+        return new DbOrder(id, user, products, ORDER_QUANTITY, ORDER_STATUS);
     }
 
-    private OrderEntity buildEntity() {
+    private DbOrder buildEntity() {
         return buildEntity(ORDER_ID_1, prepareUser(), prepareProducts());
     }
 
-    private List<OrderEntity> buildEntities () {
+    private List<DbOrder> buildEntities () {
         return List.of(
                 buildEntity(ORDER_ID_1, prepareUser(), prepareProducts()),
                 buildEntity(ORDER_ID_2, prepareUser(), prepareProducts()));
     }
 
-    private OrderDTO buildResponse(Long id, OrderStatus status, List<ProductEntity> products) {
+    private OrderDTO buildResponse(Long id, OrderStatus status, List<DbProduct> products) {
         return new OrderDTO(id, status, products);
     }
 

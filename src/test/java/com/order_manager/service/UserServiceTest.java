@@ -2,7 +2,7 @@ package com.order_manager.service;
 
 import com.order_manager.dto.UserDTO;
 import com.order_manager.dto.UserInput;
-import com.order_manager.entity.UserEntity;
+import com.order_manager.entity.DbUser;
 import com.order_manager.entity.UserRole;
 import com.order_manager.mapper.UserMapper;
 import com.order_manager.repository.UserRepository;
@@ -65,7 +65,7 @@ public class UserServiceTest {
         when(userRepository.findByName(input.name())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(input.password())).thenReturn(USER_PASSWORD);
         when(userMapper.dbToDto(any())).thenReturn(createdUser);
-        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        when(userRepository.save(any(DbUser.class))).thenReturn(userEntity);
 
         // WHEN
         var actualUser = userService.createUser(input);
@@ -80,7 +80,7 @@ public class UserServiceTest {
         verify(userRepository, times(1)).findByName(input.name());
         verify(passwordEncoder, times(1)).encode(input.password());
         verify(userMapper, times(1)).dbToDto(any());
-        verify(userRepository, times(1)).save(any(UserEntity.class));
+        verify(userRepository, times(1)).save(any(DbUser.class));
         verifyNoMoreInteractions(userRepository, passwordEncoder, userMapper);
     }
 
@@ -153,7 +153,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("""
-        GIVEN Existing user and a user input
+        GIVEN Existing user and input for updating the user
         WHEN Updating the user
         THEN Updated user should be updated with new values
         """)
@@ -167,7 +167,7 @@ public class UserServiceTest {
         when(userRepository.findById(oldUser.getId())).thenReturn(Optional.of(oldUser));
         when(passwordEncoder.encode(input.password())).thenReturn(USER_PASSWORD);
         when(userMapper.dbToDto(any())).thenReturn(updatedUser);
-        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        when(userRepository.save(any(DbUser.class))).thenReturn(userEntity);
 
         // WHEN
         var actualUser = userService.updateUser(oldUser.getId(), input);
@@ -183,13 +183,12 @@ public class UserServiceTest {
         verify(userRepository, times(1)).findById(oldUser.getId());
         verify(passwordEncoder, times(1)).encode(input.password());
         verify(userMapper, times(1)).dbToDto(any());
-        verify(userRepository, times(1)).save(any(UserEntity.class));
+        verify(userRepository, times(1)).save(any(DbUser.class));
         verifyNoMoreInteractions(userRepository, passwordEncoder, userMapper);
     }
 
     @Test
     @DisplayName("""
-        Should delete the existing user by id:
             GIVEN Existing user
             WHEN Deleting the user
             THEN User should be deleted
@@ -209,15 +208,15 @@ public class UserServiceTest {
         verifyNoMoreInteractions(userRepository);
     }
 
-    private UserEntity buildEntity(Long id, String name, String email) {
-        return new UserEntity(id, name, USER_PASSWORD, USER_ROLE, email);
+    private DbUser buildEntity(Long id, String name, String email) {
+        return new DbUser(id, name, USER_PASSWORD, USER_ROLE, email);
     }
 
-    private UserEntity buildEntity() {
+    private DbUser buildEntity() {
         return buildEntity(USER_ID_1, USER_NAME_1, USER_EMAIL_1);
     }
 
-    private List<UserEntity> buildEntities() {
+    private List<DbUser> buildEntities() {
         return List.of(
                 buildEntity(USER_ID_1, USER_NAME_1, USER_EMAIL_1),
                 buildEntity(USER_ID_2, USER_NAME_2, USER_EMAIL_2)

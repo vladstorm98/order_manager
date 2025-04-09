@@ -3,7 +3,7 @@ package com.order_manager.service;
 import com.order_manager.dto.UserDTO;
 import com.order_manager.dto.UserInput;
 import com.order_manager.entity.UserRole;
-import com.order_manager.entity.UserEntity;
+import com.order_manager.entity.DbUser;
 import com.order_manager.exception.UserNotFoundException;
 import com.order_manager.mapper.UserMapper;
 import com.order_manager.repository.UserRepository;
@@ -30,7 +30,7 @@ public class UserService {
             throw new EntityExistsException("User with name " + input.name() + " already exists");
         }
 
-        UserEntity user = new UserEntity(
+        DbUser user = new DbUser(
                 input.name(), passwordEncoder.encode(input.password()), UserRole.USER, input.email());
 
         UserDTO response = userMapper.dbToDto(userRepository.save(user));
@@ -62,7 +62,7 @@ public class UserService {
             throw new UserNotFoundException("User with id #" + id + " not found");
         }
 
-        UserEntity user = new UserEntity(
+        DbUser user = new DbUser(
                 id, input.name(), passwordEncoder.encode(input.password()), UserRole.USER, input.email());
 
         UserDTO response = userMapper.dbToDto(userRepository.save(user));

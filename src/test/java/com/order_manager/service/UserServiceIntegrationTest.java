@@ -31,9 +31,9 @@ public class UserServiceIntegrationTest extends BaseTest {
 
     @Test
     @DisplayName("""
-            GIVEN a user request
-            WHEN  creating a new user
-            THEN  the created user should be returned and saved in the database
+            GIVEN Input for creating a new user
+            WHEN Creating a new user
+            THEN Created user should be returned and saved to the database
             """)
     void shouldCreateUser() {
         // GIVEN
@@ -58,9 +58,9 @@ public class UserServiceIntegrationTest extends BaseTest {
 
         @Test
         @DisplayName("""
-            GIVEN a list of existing users in the database
-            WHEN  fetching all users from the repository
-            THEN  all existing users in the database should be returned
+            GIVEN List of existing users in the database
+            WHEN Fetching all users from the repository
+            THEN All existing users from the database should be returned
             """)
         void shouldGetAllUsers() {
             // GIVEN
@@ -84,9 +84,9 @@ public class UserServiceIntegrationTest extends BaseTest {
 
         @Test
         @DisplayName("""
-            GIVEN an existing user
-            WHEN  fetching the user by id
-            THEN  the created user should be returned
+            GIVEN Existing user
+            WHEN Fetching the user by id
+            THEN Created user should be returned
             """)
         void shouldGetUserById() {
             // GIVEN
@@ -106,9 +106,9 @@ public class UserServiceIntegrationTest extends BaseTest {
 
         @Test
         @DisplayName("""
-            GIVEN an existing user and a user request
-            WHEN  updating the user
-            THEN  the updated user should be updated with new values and saved in the database
+            GIVEN Existing user and input for updating the user
+            WHEN Updating the user
+            THEN User should be updated with the new values and saved to the database
             """)
         void shouldUpdateUser() {
             // GIVEN
@@ -131,9 +131,9 @@ public class UserServiceIntegrationTest extends BaseTest {
 
         @Test
         @DisplayName("""
-            GIVEN an existing user
-            WHEN  deleting the user
-            THEN  the user should be deleted from the database
+            GIVEN Existing user
+            WHEN Deleting the user
+            THEN User should be deleted from the database
             """)
         void shouldDeleteUser() {
             // GIVEN

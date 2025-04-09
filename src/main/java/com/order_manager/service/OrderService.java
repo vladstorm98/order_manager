@@ -2,9 +2,9 @@ package com.order_manager.service;
 
 import com.order_manager.dto.OrderDTO;
 import com.order_manager.dto.OrderInput;
-import com.order_manager.entity.OrderEntity;
+import com.order_manager.entity.DbOrder;
 import com.order_manager.entity.OrderStatus;
-import com.order_manager.entity.UserEntity;
+import com.order_manager.entity.DbUser;
 import com.order_manager.exception.OrderNotFoundException;
 import com.order_manager.exception.ProductNotFoundException;
 import com.order_manager.exception.UserNotFoundException;
@@ -38,10 +38,10 @@ public class OrderService {
             }
         });
 
-        UserEntity user = userRepository.findByName(username)
+        DbUser user = userRepository.findByName(username)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
 
-        OrderEntity order = new OrderEntity(user, input.products(), input.quantity(), OrderStatus.PENDING);
+        DbOrder order = new DbOrder(user, input.products(), input.quantity(), OrderStatus.PENDING);
 
         OrderDTO response = orderMapper.dbToDto(orderRepository.save(order));
 
@@ -62,7 +62,7 @@ public class OrderService {
 
     @Transactional
     public OrderDTO updateOrderStatus(@NonNull Long id, OrderStatus status) {
-        OrderEntity order = orderRepository.findById(id)
+        DbOrder order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Order with id #" + id + " not found"));
         order.setStatus(status);
 

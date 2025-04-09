@@ -1,8 +1,8 @@
 package com.order_manager.controller;
 
-import com.order_manager.dto.AuthResponse;
-import com.order_manager.dto.AuthRequest;
-import com.order_manager.dto.UserRequest;
+import com.order_manager.dto.AuthDTO;
+import com.order_manager.dto.AuthInput;
+import com.order_manager.dto.UserInput;
 import com.order_manager.security.JwtTokenProvider;
 import com.order_manager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,21 +27,21 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Registration a new user")
-    public void register(@RequestBody @Valid UserRequest request) {
-        userService.createUser(request);
+    public void register(@RequestBody @Valid UserInput input) {
+        userService.createUser(input);
     }
 
     @PostMapping("/login")
     @Operation(summary = "User authorization")
-    public AuthResponse login(@RequestBody AuthRequest request) {
+    public AuthDTO login(@RequestBody AuthInput input) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.name(), request.password()));
+                new UsernamePasswordAuthenticationToken(input.name(), input.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String token = jwtTokenProvider.createToken(request.name());
+        String token = jwtTokenProvider.createToken(input.name());
 
-        return new AuthResponse(token);
+        return new AuthDTO(token);
     }
 
     @PostMapping("/logout")

@@ -10,9 +10,9 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@EqualsAndHashCode
 @Table(name = "products")
-public class ProductEntity {
+public class DbProduct {
 
     @Id
     @GeneratedValue

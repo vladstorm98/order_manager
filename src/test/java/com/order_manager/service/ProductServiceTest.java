@@ -1,8 +1,8 @@
 package com.order_manager.service;
 
 import com.order_manager.client.ProductClient;
-import com.order_manager.dto.ProductRequest;
-import com.order_manager.dto.ProductResponse;
+import com.order_manager.dto.ProductInput;
+import com.order_manager.dto.ProductDTO;
 import com.order_manager.exception.ProductExistException;
 import com.order_manager.exception.ProductNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("JUnit tests for ProductService")
+@DisplayName("Unit tests for ProductService")
 public class ProductServiceTest {
 
     private static final Long PRODUCT_ID_1 = 1L;
@@ -46,19 +46,19 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN a product request
-            WHEN creating a new product
-            THEN the created product should be returned with correct details
+            GIVEN Input for creating a new product
+            WHEN Creating a new product
+            THEN Created product should be returned with correct details
             """)
     void shouldCreateProduct() {
         //GIVEN
-        var request = new ProductRequest(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
+        var input = new ProductInput(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
         var createdProduct = prepareProduct(PRODUCT_ID_NEW, PRODUCT_NAME_NEW, PRODUCT_PRICE_NEW);
 
-        when(productClient.createProduct(request)).thenReturn(createdProduct);
+        when(productClient.createProduct(input)).thenReturn(createdProduct);
 
         //WHEN
-        var actualProduct = productService.createProduct(request);
+        var actualProduct = productService.createProduct(input);
 
         //THEN
         assertThat(actualProduct).isNotNull()
@@ -68,34 +68,34 @@ public class ProductServiceTest {
                     assertThat(product.price()).isEqualTo(createdProduct.price());
                 });
 
-        verify(productClient, times(1)).createProduct(request);
+        verify(productClient, times(1)).createProduct(input);
         verifyNoMoreInteractions(productClient);
     }
 
     @Test
     @DisplayName("""
-            GIVEN a product request
-            WHEN the product already exists
-            THEN a ProductExistException should be thrown
+            GIVEN Input for creating a new product
+            WHEN Product already exists
+            THEN ProductExistException should be thrown
             """)
     void shouldThrowException_whenProductExists() {
         //GIVEN
-        var request = new ProductRequest(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
+        var input = new ProductInput(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
 
         //WHEN
-        when(productClient.createProduct(request)).thenReturn(null);
+        when(productClient.createProduct(input)).thenReturn(null);
 
         //THEN
-        assertThatThrownBy(() -> productService.createProduct(request))
+        assertThatThrownBy(() -> productService.createProduct(input))
                 .isInstanceOf(ProductExistException.class)
-                .hasMessageContaining("Product  with name " + request.name() + " already exists");
+                .hasMessageContaining("Product  with name " + input.name() + " already exists");
     }
 
     @Test
     @DisplayName("""
-            GIVEN the existing products
-            WHEN fetching all products
-            THEN all existing products should be returned with correct details
+            GIVEN Existing products
+            WHEN Fetching all products
+            THEN All existing products should be returned with correct details
             """)
     void shouldGetAllProducts() {
         //GIVEN
@@ -123,8 +123,8 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            WHEN fetching empty list of products
-            THEN a ProductNotFoundException should be thrown
+            WHEN Fetching empty list of products
+            THEN ProductNotFoundException should be thrown
             """)
     void shouldThrowException_whenAllProductsNotFound() {
         //WHEN
@@ -138,9 +138,9 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN the existing product
-            WHEN fetching a product
-            THEN the existing product should be returned with correct details
+            GIVEN Existing product
+            WHEN Fetching a product
+            THEN Existing product should be returned with correct details
             """)
     void shouldGetProduct() {
         //GIVEN
@@ -149,7 +149,7 @@ public class ProductServiceTest {
         when(productClient.getProduct(expectedProduct.id())).thenReturn(expectedProduct);
 
         //WHEN
-        ProductResponse actualProduct = productService.getProduct(expectedProduct.id());
+        ProductDTO actualProduct = productService.getProduct(expectedProduct.id());
 
         //THEN
         assertThat(actualProduct).isNotNull()
@@ -165,20 +165,20 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN the existing product
-            WHEN update a product
-            THEN the product should be updated and returned with correct details
+            GIVEN Existing product
+            WHEN Updating a product
+            THEN Product should be updated and returned with correct details
             """)
     void shouldUpdateProduct() {
         //GIVEN
         var oldProduct = prepareProduct();
-        var request = new ProductRequest(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
-        var updatedProduct = prepareProduct(PRODUCT_ID_NEW, PRODUCT_NAME_NEW, PRODUCT_PRICE_NEW);
+        var input = new ProductInput(PRODUCT_NAME_NEW, PRODUCT_DESCRIPTION_NEW, PRODUCT_PRICE_NEW);
+        var updatedProduct = prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_NEW, PRODUCT_PRICE_NEW);
 
-        when(productClient.updateProduct(oldProduct.id(), request)).thenReturn(updatedProduct);
+        when(productClient.updateProduct(oldProduct.id(), input)).thenReturn(updatedProduct);
 
         //WHEN
-        ProductResponse actualProduct = productService.updateProduct(oldProduct.id(), request);
+        ProductDTO actualProduct = productService.updateProduct(oldProduct.id(), input);
 
         //THEN
         assertThat(actualProduct).isNotNull()
@@ -188,15 +188,15 @@ public class ProductServiceTest {
                     assertThat(product.price()).isEqualTo(updatedProduct.price());
                 });
 
-        verify(productClient).updateProduct(oldProduct.id(), request);
+        verify(productClient).updateProduct(oldProduct.id(), input);
         verifyNoMoreInteractions(productClient);
     }
 
     @Test
     @DisplayName("""
-            GIVEN the existing product
-            WHEN deleting a product
-            THEN the product should be deleted
+            GIVEN Existing product
+            WHEN Deleting a product
+            THEN Product should be deleted
             """)
     void shouldDeleteProduct() {
         //GIVEN
@@ -214,9 +214,9 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("""
-            GIVEN the existing product
-            WHEN the product doesn't exist
-            THEN a ProductNotFoundException should be thrown
+            GIVEN Existing product
+            WHEN Product doesn't exist
+            THEN ProductNotFoundException should be thrown
             """)
     void shouldThrowException_whenProductNotFound() {
         //GIVEN
@@ -231,15 +231,15 @@ public class ProductServiceTest {
                 .hasMessageContaining("Product with id #" + product.id() + " not found");
     }
 
-    private ProductResponse prepareProduct(Long id, String name, BigDecimal price) {
-        return new ProductResponse(id, name, price);
+    private ProductDTO prepareProduct(Long id, String name, BigDecimal price) {
+        return new ProductDTO(id, name, price);
     }
 
-    private ProductResponse prepareProduct() {
+    private ProductDTO prepareProduct() {
         return prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_PRICE_1);
     }
 
-    private List<ProductResponse> prepareProducts() {
+    private List<ProductDTO> prepareProducts() {
         return List.of(
                 prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_PRICE_1),
                 prepareProduct(PRODUCT_ID_2, PRODUCT_NAME_2, PRODUCT_PRICE_2)

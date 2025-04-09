@@ -1,8 +1,8 @@
 package com.order_manager.service;
 
 import com.order_manager.BaseTest;
-import com.order_manager.dto.UserRequest;
-import com.order_manager.dto.UserResponse;
+import com.order_manager.dto.UserInput;
+import com.order_manager.dto.UserDTO;
 import com.order_manager.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,22 +31,22 @@ public class UserServiceIntegrationTest extends BaseTest {
 
     @Test
     @DisplayName("""
-            GIVEN a user request
-            WHEN  creating a new user
-            THEN  the created user should be returned and saved in the database
+            GIVEN Input for creating a new user
+            WHEN Creating a new user
+            THEN Created user should be returned and saved to the database
             """)
     void shouldCreateUser() {
         // GIVEN
-        var request = new UserRequest(USER_NAME_NEW, USER_PASSWORD_NEW, USER_EMAIL_NEW);
+        var input = new UserInput(USER_NAME_NEW, USER_PASSWORD_NEW, USER_EMAIL_NEW);
 
         // WHEN
-        var createdUser = userService.createUser(request);
+        var createdUser = userService.createUser(input);
 
         // THEN
         assertThat(createdUser).isNotNull()
                 .satisfies(user -> {
-                    assertThat(user.name()).isEqualTo(request.name());
-                    assertThat(user.email()).isEqualTo(request.email());
+                    assertThat(user.name()).isEqualTo(input.name());
+                    assertThat(user.email()).isEqualTo(input.email());
         });
 
         assertThat(userRepository.findByName(USER_NAME_NEW)).isPresent();
@@ -58,9 +58,9 @@ public class UserServiceIntegrationTest extends BaseTest {
 
         @Test
         @DisplayName("""
-            GIVEN a list of existing users in the database
-            WHEN  fetching all users from the repository
-            THEN  all existing users in the database should be returned
+            GIVEN List of existing users in the database
+            WHEN Fetching all users from the repository
+            THEN All existing users from the database should be returned
             """)
         void shouldGetAllUsers() {
             // GIVEN
@@ -84,9 +84,9 @@ public class UserServiceIntegrationTest extends BaseTest {
 
         @Test
         @DisplayName("""
-            GIVEN an existing user
-            WHEN  fetching the user by id
-            THEN  the created user should be returned
+            GIVEN Existing user
+            WHEN Fetching the user by id
+            THEN Created user should be returned
             """)
         void shouldGetUserById() {
             // GIVEN
@@ -106,24 +106,24 @@ public class UserServiceIntegrationTest extends BaseTest {
 
         @Test
         @DisplayName("""
-            GIVEN an existing user and a user request
-            WHEN  updating the user
-            THEN  the updated user should be updated with new values and saved in the database
+            GIVEN Existing user and input for updating the user
+            WHEN Updating the user
+            THEN User should be updated with the new values and saved to the database
             """)
         void shouldUpdateUser() {
             // GIVEN
             var oldUser = prepareUser();
-            var request = new UserRequest(USER_NAME_NEW, USER_PASSWORD_NEW, USER_EMAIL_NEW);
+            var input = new UserInput(USER_NAME_NEW, USER_PASSWORD_NEW, USER_EMAIL_NEW);
 
             // WHEN
-            var updatedUser = userService.updateUser(oldUser.id(), request);
+            var updatedUser = userService.updateUser(oldUser.id(), input);
 
             // THEN
             assertThat(updatedUser).isNotNull()
                     .satisfies(user -> {
                             assertThat(user.id()).isEqualTo(oldUser.id());
-                            assertThat(user.name()).isEqualTo(request.name());
-                            assertThat(user.email()).isEqualTo(request.email());
+                            assertThat(user.name()).isEqualTo(input.name());
+                            assertThat(user.email()).isEqualTo(input.email());
             });
 
             assertThat(userRepository.findById(oldUser.id())).isPresent();
@@ -131,9 +131,9 @@ public class UserServiceIntegrationTest extends BaseTest {
 
         @Test
         @DisplayName("""
-            GIVEN an existing user
-            WHEN  deleting the user
-            THEN  the user should be deleted from the database
+            GIVEN Existing user
+            WHEN Deleting the user
+            THEN User should be deleted from the database
             """)
         void shouldDeleteUser() {
             // GIVEN
@@ -147,15 +147,15 @@ public class UserServiceIntegrationTest extends BaseTest {
         }
     }
 
-    private UserResponse prepareUser(Long id, String name, String email) {
-        return new UserResponse(id, name, email);
+    private UserDTO prepareUser(Long id, String name, String email) {
+        return new UserDTO(id, name, email);
     }
 
-    private UserResponse prepareUser() {
+    private UserDTO prepareUser() {
         return prepareUser(USER_ID_1, USER_NAME_1, USER_EMAIL_1);
     }
 
-    private List<UserResponse> prepareUsers() {
+    private List<UserDTO> prepareUsers() {
         return List.of(
                 prepareUser(USER_ID_1, USER_NAME_1, USER_EMAIL_1),
                 prepareUser(USER_ID_2, USER_NAME_2, USER_EMAIL_2)

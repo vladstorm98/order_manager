@@ -2,7 +2,7 @@ package com.order_manager.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.order_manager.dto.ProductInput;
-import com.order_manager.dto.ProductDTO;
+import com.order_manager.dto.ProductDto;
 import com.order_manager.service.ProductService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,9 +22,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@SpringBootTest
+@SpringBootTest()
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
-@DisplayName("JUnit tests for ProductController")
+@DisplayName("Unit tests for ProductController")
 class ProductControllerTest {
 
     private static final Long PRODUCT_ID_1 = 1L;
@@ -183,15 +185,15 @@ class ProductControllerTest {
         verifyNoMoreInteractions(productService);
     }
 
-    private ProductDTO prepareProduct(Long id, String name, BigDecimal price) {
-        return new ProductDTO(id, name, price);
+    private ProductDto prepareProduct(Long id, String name, BigDecimal price) {
+        return new ProductDto(id, name, price);
     }
 
-    private ProductDTO prepareProduct() {
+    private ProductDto prepareProduct() {
         return prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_PRICE_1);
     }
 
-    private List<ProductDTO> prepareProducts() {
+    private List<ProductDto> prepareProducts() {
         return List.of(
                 prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_PRICE_1),
                 prepareProduct(PRODUCT_ID_2, PRODUCT_NAME_2, PRODUCT_PRICE_2)

@@ -1,6 +1,6 @@
 package com.order_manager.service;
 
-import com.order_manager.dto.UserDTO;
+import com.order_manager.dto.UserDto;
 import com.order_manager.dto.UserInput;
 import com.order_manager.entity.DbUser;
 import com.order_manager.entity.UserRole;
@@ -223,15 +223,15 @@ public class UserServiceTest {
         );
     }
 
-    private UserDTO buildResponse(Long id, String name, String email) {
-        return new UserDTO(id, name, email);
+    private UserDto buildResponse(Long id, String name, String email) {
+        return new UserDto(id, name, email);
     }
 
-    private UserDTO buildResponse() {
+    private UserDto buildResponse() {
         return buildResponse(USER_ID_1, USER_NAME_1, USER_EMAIL_1);
     }
 
-    private List<UserDTO> buildResponses() {
+    private List<UserDto> buildResponses() {
         return List.of(
                 buildResponse(USER_ID_1, USER_NAME_1, USER_EMAIL_1),
                 buildResponse(USER_ID_2, USER_NAME_2, USER_EMAIL_2)

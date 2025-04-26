@@ -1,7 +1,7 @@
 package com.order_manager.service;
 
 import com.order_manager.BaseTest;
-import com.order_manager.dto.OrderDTO;
+import com.order_manager.dto.OrderDto;
 import com.order_manager.dto.OrderInput;
 import com.order_manager.entity.DbProduct;
 import com.order_manager.entity.OrderStatus;
@@ -22,8 +22,8 @@ public class OrderServiceIntegrationTest extends BaseTest {
 
     private static final Long PRODUCT_ID_1 = 1L;
     private static final Long PRODUCT_ID_2 = 2L;
-    private static final String PRODUCT_NAME_1 = "Product 1";
-    private static final String PRODUCT_NAME_2 = "Product 2";
+    private static final String PRODUCT_NAME_1 = "Product_1";
+    private static final String PRODUCT_NAME_2 = "Product_2";
     private static final String PRODUCT_DESCRIPTION = "Product Description";
     private static final BigDecimal PRODUCT_PRICE_1 = BigDecimal.ONE;
     private static final BigDecimal PRODUCT_PRICE_2 = BigDecimal.TWO;
@@ -71,12 +71,12 @@ public class OrderServiceIntegrationTest extends BaseTest {
             WHEN Fetching all user orders from the repository
             THEN All user orders from the database should be returned
             """)
-    public void shouldGetAllOrdersForUser() {
+    public void shouldGetOrdersByUsername() {
         //GIVEN
         var expectedOrders = buildDTOs();
 
         //WHEN
-        var actualOrders = orderService.getAllOrdersForUser(USER_NAME);
+        var actualOrders = orderService.getOrdersByUsername(USER_NAME);
 
         //THEN
         assertThat(actualOrders).isNotNull()
@@ -141,15 +141,15 @@ public class OrderServiceIntegrationTest extends BaseTest {
         );
     }
 
-    private OrderDTO buildDTO(Long id, OrderStatus status, List<DbProduct> products) {
-        return new OrderDTO(id, status, products);
+    private OrderDto buildDTO(Long id, OrderStatus status, List<DbProduct> products) {
+        return new OrderDto(id, status, products);
     }
 
-    private OrderDTO buildDTO() {
+    private OrderDto buildDTO() {
         return buildDTO(ORDER_ID_1, ORDER_STATUS, prepareProducts());
     }
 
-    private List<OrderDTO> buildDTOs() {
+    private List<OrderDto> buildDTOs() {
         return List.of(
                 buildDTO(ORDER_ID_1, ORDER_STATUS, prepareProducts()),
                 buildDTO(ORDER_ID_2, ORDER_STATUS, prepareProducts())

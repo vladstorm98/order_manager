@@ -1,6 +1,6 @@
 package com.order_manager.controller;
 
-import com.order_manager.dto.OrderDTO;
+import com.order_manager.dto.OrderDto;
 import com.order_manager.dto.OrderInput;
 import com.order_manager.entity.OrderStatus;
 import com.order_manager.service.OrderService;
@@ -23,20 +23,20 @@ public class OrderController {
 
     @GetMapping
     @Operation(summary = "Get orders for a user")
-    public List<OrderDTO> getAllOrdersForUser(@AuthenticationPrincipal UserDetails userDetails) {
-        return orderService.getAllOrdersForUser(userDetails.getUsername());
+    public List<OrderDto> getOrdersByUsername(@AuthenticationPrincipal UserDetails userDetails) {
+        return orderService.getOrdersByUsername(userDetails.getUsername());
     }
 
     @PostMapping
     @Operation(summary = "Create a new order")
-    public OrderDTO createOrder(@AuthenticationPrincipal UserDetails userDetails,
+    public OrderDto createOrder(@AuthenticationPrincipal UserDetails userDetails,
                                 @RequestBody OrderInput input) {
         return orderService.createOrder(userDetails.getUsername(), input);
     }
 
     @PutMapping("/{orderId}")
     @Operation(summary = "Update status of the order by ID")
-    public OrderDTO updateOrderStatus(@Parameter(description = "Type ID of the order to be updated")
+    public OrderDto updateOrderStatus(@Parameter(description = "Type ID of the order to be updated")
                                            @PathVariable Long orderId) {
         return orderService.updateOrderStatus(orderId, OrderStatus.COMPLETED);
     }

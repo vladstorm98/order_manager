@@ -2,7 +2,7 @@ package com.order_manager.service;
 
 import com.order_manager.BaseTest;
 import com.order_manager.dto.UserInput;
-import com.order_manager.dto.UserDTO;
+import com.order_manager.dto.UserDto;
 import com.order_manager.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,15 +147,15 @@ public class UserServiceIntegrationTest extends BaseTest {
         }
     }
 
-    private UserDTO prepareUser(Long id, String name, String email) {
-        return new UserDTO(id, name, email);
+    private UserDto prepareUser(Long id, String name, String email) {
+        return new UserDto(id, name, email);
     }
 
-    private UserDTO prepareUser() {
+    private UserDto prepareUser() {
         return prepareUser(USER_ID_1, USER_NAME_1, USER_EMAIL_1);
     }
 
-    private List<UserDTO> prepareUsers() {
+    private List<UserDto> prepareUsers() {
         return List.of(
                 prepareUser(USER_ID_1, USER_NAME_1, USER_EMAIL_1),
                 prepareUser(USER_ID_2, USER_NAME_2, USER_EMAIL_2)

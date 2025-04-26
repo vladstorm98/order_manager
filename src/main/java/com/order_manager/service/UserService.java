@@ -1,6 +1,6 @@
 package com.order_manager.service;
 
-import com.order_manager.dto.UserDTO;
+import com.order_manager.dto.UserDto;
 import com.order_manager.dto.UserInput;
 import com.order_manager.entity.UserRole;
 import com.order_manager.entity.DbUser;
@@ -25,50 +25,44 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
-    public UserDTO createUser(UserInput input) {
+    public UserDto createUser(UserInput input) {
         if (userRepository.findByName(input.name()).isPresent()) {
             throw new EntityExistsException("User with name " + input.name() + " already exists");
         }
-
-        DbUser user = new DbUser(
-                input.name(), passwordEncoder.encode(input.password()), UserRole.USER, input.email());
+        var dbUser = createDbUser(input);
 
         UserDTO response = userMapper.dbToDto(userRepository.save(user));
-
-        log.info("User with id #{} was created", response.id());
         return response;
+        log.info("User with id #{} was created", userDto.id());
     }
 
-    public List<UserDTO> getAllUsers() {
-        List<UserDTO> response = userRepository.findAll().stream()
+    public List<UserDto> getAllUsers() {
+        List<UserDto> userDto = userRepository.findAll().stream()
                 .map(userMapper::dbToDto)
                 .toList();
 
         log.info("Users was retrieved");
-        return response;
+        return userDto;
     }
 
-    public UserDTO getUserById(@NonNull Long id) {
-        UserDTO response = userRepository.findById(id)
+    public UserDto getUserById(@NonNull Long id) {
+        var userDto = userRepository.findById(id)
                 .map(userMapper::dbToDto)
                 .orElseThrow(() -> new UserNotFoundException("User with id #" + id + " not found"));
 
         log.info("User with id #{} was retrieved", id);
-        return response;
+        return userDto;
     }
 
-    public UserDTO updateUser(@NonNull Long id, UserInput input) {
+    public UserDto updateUser(@NonNull Long id, UserInput input) {
         if (userRepository.findById(id).isEmpty()) {
             throw new UserNotFoundException("User with id #" + id + " not found");
         }
-
-        DbUser user = new DbUser(
-                id, input.name(), passwordEncoder.encode(input.password()), UserRole.USER, input.email());
-
-        UserDTO response = userMapper.dbToDto(userRepository.save(user));
+        var dbUser = createDbUser(id, input);
+        var userDto = saveAndConvertToDto(dbUser);
 
         log.info("User with id #{} was updated", id);
-        return response;
+        return userDto;
     }
 
     public void deleteUser(@NonNull Long id) {
@@ -77,5 +71,13 @@ public class UserService {
                         () -> { throw new UserNotFoundException("User with id #" + id + " not found"); });
 
         log.info("Product with id #{} was deleted", id);
+    }
+
+    private DbUser createDbUser(Long id, UserInput input) {
+        return new DbUser(id, input.name(), passwordEncoder.encode(input.password()), UserRole.USER, input.email());
+    }
+
+    private UserDto saveAndConvertToDto(DbUser user) {
+        return userMapper.dbToDto(userRepository.save(user));
     }
 }

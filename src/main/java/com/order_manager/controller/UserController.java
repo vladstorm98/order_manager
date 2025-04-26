@@ -1,12 +1,14 @@
 package com.order_manager.controller;
 
-import com.order_manager.dto.UserDTO;
+import com.order_manager.dto.UserDto;
 import com.order_manager.dto.UserInput;
 import com.order_manager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Tag(name = "Users")
@@ -16,21 +18,27 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/{userId}")
-    @Operation(summary ="Get user by ID")
-    public UserDTO getUser(@PathVariable Long userId) {
-        return userService.getUserById(userId);
-    }
-
     @PostMapping
     @Operation(summary = "Create a new user")
-    public UserDTO createUser(@RequestBody UserInput input) {
+    public UserDto createUser(@RequestBody UserInput input) {
         return userService.createUser(input);
+    }
+
+    @GetMapping()
+    @Operation(summary ="Get all users")
+    public List<UserDto> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{userId}")
+    @Operation(summary ="Get user by ID")
+    public UserDto getUser(@PathVariable Long userId) {
+        return userService.getUserById(userId);
     }
 
     @PutMapping("/{userId}")
     @Operation(summary = "Update user by ID")
-    public UserDTO updateUser(@PathVariable Long userId, @RequestBody UserInput input) {
+    public UserDto updateUser(@PathVariable Long userId, @RequestBody UserInput input) {
         return userService.updateUser(userId, input);
     }
 

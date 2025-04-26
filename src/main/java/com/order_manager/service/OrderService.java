@@ -3,8 +3,8 @@ package com.order_manager.service;
 import com.order_manager.dto.OrderDTO;
 import com.order_manager.dto.OrderInput;
 import com.order_manager.entity.DbOrder;
-import com.order_manager.entity.OrderStatus;
 import com.order_manager.entity.DbUser;
+import com.order_manager.entity.OrderStatus;
 import com.order_manager.exception.OrderNotFoundException;
 import com.order_manager.exception.ProductNotFoundException;
 import com.order_manager.exception.UserNotFoundException;
@@ -17,6 +17,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -30,56 +31,66 @@ public class OrderService {
     private final NotificationService notificationService;
     private final OrderMapper orderMapper;
 
-    public OrderDTO createOrder(String username, OrderInput input) {
-
+    public OrderDto createOrder(String username, OrderInput input) {
         input.products().forEach(product -> {
             if (productRepository.findById(product.getId()).isEmpty()) {
                 throw new ProductNotFoundException("No valid products found");
             }
         });
 
-        DbUser user = userRepository.findByName(username)
-                .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
+        var dbUser = userRepository.findByName(username)
+                .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));
 
-        DbOrder order = new DbOrder(user, input.products(), input.quantity(), OrderStatus.PENDING);
+        var dbOrder = createDbOrder(dbUser, input);
+        var orderDto = saveAndConvertToDto(dbOrder);
 
         OrderDTO response = orderMapper.dbToDto(orderRepository.save(order));
 
-        log.info("Order with id #{} was created", response.id());
-        return response;
+        log.info("Order with id #{} was created", orderDto.id());
+        return orderDto;
     }
 
     @Transactional
-    public List<OrderDTO> getAllOrdersForUser(String username) {
-        List<OrderDTO> response = orderRepository.findByUserName(username)
+    public List<OrderDto> getOrdersByUsername(String username) {
+
+        List<OrderDto> orderDto = orderRepository.findByUserName(username)
                 .stream()
                 .map(orderMapper::dbToDto)
                 .toList();
 
-        log.info("Orders were successfully retrieved");
-        return response;
+
+        log.info("Orders retrieved from DB");
+        return orderDto;
     }
 
     @Transactional
-    public OrderDTO updateOrderStatus(@NonNull Long id, OrderStatus status) {
-        DbOrder order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException("Order with id #" + id + " not found"));
-        order.setStatus(status);
+    public OrderDto updateOrderStatus(@NonNull Long id, OrderStatus status) {
+        var dbOrder = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id #" + id + " not found"))
+                .setStatus(status);
 
-        notificationService.sendOrderStatusChangeNotification(order.getUser().getEmail(), id, status);
+        var orderDto = saveAndConvertToDto(dbOrder);
 
-        OrderDTO response = orderMapper.dbToDto(orderRepository.save(order));
+        notificationService.sendOrderStatusChangeNotification(dbOrder.getUser().getEmail(), id, status);
 
         log.info("Order with id #{} was updated", id);
-        return response;
+        return orderDto;
     }
 
     public void deleteOrder(@NonNull Long id) {
-        if (orderRepository.existsById(id)) {
-            orderRepository.deleteById(id);
-            log.info("Order with id #{} was deleted", id);
-        } else {
-            throw new OrderNotFoundException("Order with id #" + id + " not found");
-        }
+        var dbOrder = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id #" + id + " not found"));
+
+        orderRepository.deleteById(id);
+
+        log.info("Order with id #{} was deleted", id);
+    }
+
+    private DbOrder createDbOrder(DbUser user, OrderInput input) {
+        return new DbOrder(user, input.products(), input.quantity(), OrderStatus.PENDING);
+    }
+
+    private OrderDto saveAndConvertToDto(DbOrder order) {
+        return orderMapper.dbToDto(orderRepository.save(order));
     }
 }

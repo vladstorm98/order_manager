@@ -1,6 +1,6 @@
 package com.order_manager.client;
 
-import com.order_manager.dto.UserDTO;
+import com.order_manager.dto.UserDto;
 import com.order_manager.dto.UserInput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,29 +12,29 @@ public class UserWebClient implements UserUrlTemplate {
 
     private final WebClient webClient;
 
-    public UserDTO fetchUser(Long userId) {
+    public UserDto fetchUser(Long userId) {
         return webClient.get()
                 .uri(USER_BY_ID, userId)
                 .retrieve()
-                .bodyToMono(UserDTO.class)
+                .bodyToMono(UserDto.class)
                 .block();
     }
 
-    public UserDTO createUser(UserInput userRequest) {
+    public UserDto createUser(UserInput userRequest) {
         return webClient.post()
                 .uri(USERS)
                 .bodyValue(userRequest)
                 .retrieve()
-                .bodyToMono(UserDTO.class)
+                .bodyToMono(UserDto.class)
                 .block();
     }
 
-    public UserDTO updateUser(Long userId, UserInput userRequest) {
+    public UserDto updateUser(Long userId, UserInput userRequest) {
         return webClient.put()
                 .uri(USER_BY_ID, userId)
                 .bodyValue(userRequest)
                 .retrieve()
-                .bodyToMono(UserDTO.class)
+                .bodyToMono(UserDto.class)
                 .block();
     }
 

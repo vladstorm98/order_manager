@@ -1,6 +1,6 @@
 package com.order_manager.controller;
 
-import com.order_manager.dto.AuthDTO;
+import com.order_manager.dto.AuthDto;
 import com.order_manager.dto.AuthInput;
 import com.order_manager.dto.UserInput;
 import com.order_manager.security.JwtTokenProvider;
@@ -33,7 +33,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "User authorization")
-    public AuthDTO login(@RequestBody AuthInput input) {
+    public AuthDto login(@RequestBody AuthInput input) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(input.name(), input.password()));
@@ -41,7 +41,7 @@ public class AuthController {
 
         String token = jwtTokenProvider.createToken(input.name());
 
-        return new AuthDTO(token);
+        return new AuthDto(token);
     }
 
     @PostMapping("/logout")

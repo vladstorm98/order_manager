@@ -1,6 +1,6 @@
 package com.order_manager.service;
 
-import com.order_manager.dto.OrderDTO;
+import com.order_manager.dto.OrderDto;
 import com.order_manager.dto.OrderInput;
 import com.order_manager.entity.*;
 import com.order_manager.exception.OrderNotFoundException;
@@ -150,7 +150,7 @@ public class OrderServiceTest {
             WHEN Fetching the orders
             THEN Should return all orders for user
             """)
-    void shouldGetAllOrdersForUser() {
+    void shouldGetOrdersByUsername() {
         //GIVEN
         var orderEntities = buildEntities();
         var expectedOrders = buildResponses();
@@ -160,7 +160,7 @@ public class OrderServiceTest {
         when(orderMapper.dbToDto(orderEntities.getLast())).thenReturn(expectedOrders.getLast());
 
         //WHEN
-        var actualOrders = orderService.getAllOrdersForUser(USER_NAME);
+        var actualOrders = orderService.getOrdersByUsername(USER_NAME);
 
         //THEN
         assertThat(actualOrders)
@@ -300,11 +300,11 @@ public class OrderServiceTest {
                 buildEntity(ORDER_ID_2, prepareUser(), prepareProducts()));
     }
 
-    private OrderDTO buildResponse(Long id, OrderStatus status, List<DbProduct> products) {
-        return new OrderDTO(id, status, products);
+    private OrderDto buildResponse(Long id, OrderStatus status, List<DbProduct> products) {
+        return new OrderDto(id, status, products);
     }
 
-    private List<OrderDTO> buildResponses() {
+    private List<OrderDto> buildResponses() {
         return List.of(
                 buildResponse(ORDER_ID_1, ORDER_STATUS, prepareProducts()),
                 buildResponse(ORDER_ID_2, ORDER_STATUS, prepareProducts())

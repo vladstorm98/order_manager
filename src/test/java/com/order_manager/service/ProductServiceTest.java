@@ -2,7 +2,7 @@ package com.order_manager.service;
 
 import com.order_manager.client.ProductClient;
 import com.order_manager.dto.ProductInput;
-import com.order_manager.dto.ProductDTO;
+import com.order_manager.dto.ProductDto;
 import com.order_manager.exception.ProductExistException;
 import com.order_manager.exception.ProductNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -149,7 +149,7 @@ public class ProductServiceTest {
         when(productClient.getProduct(expectedProduct.id())).thenReturn(expectedProduct);
 
         //WHEN
-        ProductDTO actualProduct = productService.getProduct(expectedProduct.id());
+        ProductDto actualProduct = productService.getProduct(expectedProduct.id());
 
         //THEN
         assertThat(actualProduct).isNotNull()
@@ -178,7 +178,7 @@ public class ProductServiceTest {
         when(productClient.updateProduct(oldProduct.id(), input)).thenReturn(updatedProduct);
 
         //WHEN
-        ProductDTO actualProduct = productService.updateProduct(oldProduct.id(), input);
+        ProductDto actualProduct = productService.updateProduct(oldProduct.id(), input);
 
         //THEN
         assertThat(actualProduct).isNotNull()
@@ -231,15 +231,15 @@ public class ProductServiceTest {
                 .hasMessageContaining("Product with id #" + product.id() + " not found");
     }
 
-    private ProductDTO prepareProduct(Long id, String name, BigDecimal price) {
-        return new ProductDTO(id, name, price);
+    private ProductDto prepareProduct(Long id, String name, BigDecimal price) {
+        return new ProductDto(id, name, price);
     }
 
-    private ProductDTO prepareProduct() {
+    private ProductDto prepareProduct() {
         return prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_PRICE_1);
     }
 
-    private List<ProductDTO> prepareProducts() {
+    private List<ProductDto> prepareProducts() {
         return List.of(
                 prepareProduct(PRODUCT_ID_1, PRODUCT_NAME_1, PRODUCT_PRICE_1),
                 prepareProduct(PRODUCT_ID_2, PRODUCT_NAME_2, PRODUCT_PRICE_2)

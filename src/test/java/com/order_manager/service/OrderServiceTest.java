@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -141,7 +142,7 @@ public class OrderServiceTest {
         //THEN
         assertThatThrownBy(() -> orderService.createOrder(USER_NAME, input))
                 .isInstanceOf(UserNotFoundException.class)
-                .hasMessageContaining("User with username " + USER_NAME + " not found");
+                .hasMessageContaining("User '" + USER_NAME + "' not found");
     }
 
     @Test
@@ -182,6 +183,41 @@ public class OrderServiceTest {
         verify(orderRepository, times(1)).findByUserName(USER_NAME);
         verify(orderMapper, times(orderEntities.size())).dbToDto(any());
         verifyNoMoreInteractions(orderRepository, orderMapper);
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN Existing order
+            WHEN Fetching the order
+            THEN The order should be returned with correct data
+            """)
+    void shouldGetOrder() {
+        //GIVEN
+        var orderEntity = buildEntity();
+        var expectedOrder = buildResponse(ORDER_ID_1, ORDER_STATUS, prepareProducts());
+
+        when(orderRepository.findById(orderEntity.getId())).thenReturn(Optional.of(orderEntity));
+        when(orderMapper.dbToDto(orderEntity)).thenReturn(expectedOrder);
+
+        //WHEN
+        var actualOrder = orderService.getOrder(orderEntity.getId());
+
+        //THEN
+        assertThat(actualOrder)
+                .satisfies(order -> {
+                    assertThat(order.id()).isEqualTo(expectedOrder.id());
+                    assertThat(order.status()).isEqualTo(expectedOrder.status());
+                    assertThat(order.products()).hasSize(expectedOrder.products().size());
+                    assertThat(order.products()).containsExactlyInAnyOrderElementsOf(expectedOrder.products());
+                    assertThat(order.products().getFirst().getId()).isEqualTo(expectedOrder.products().getFirst().getId());
+                    assertThat(order.products().getFirst().getName()).isEqualTo(expectedOrder.products().getFirst().getName());
+                    assertThat(order.products().getFirst().getDescription()).isEqualTo(expectedOrder.products().getFirst().getDescription());
+                    assertThat(order.products().getFirst().getPrice()).isEqualTo(expectedOrder.products().getFirst().getPrice());
+                });
+
+        verify(orderRepository, times(1)).findById(orderEntity.getId());
+        verify(orderMapper, times(1)).dbToDto(orderEntity);
+        verifyNoMoreInteractions(orderRepository, orderMapper, notificationService);
     }
 
     @Test
@@ -246,17 +282,17 @@ public class OrderServiceTest {
             """)
     void shouldDeleteOrder() {
         //GIVEN
-        var orderEntity = buildEntity();
+        var dbOrder = buildEntity();
 
-        when(orderRepository.existsById(orderEntity.getId())).thenReturn(true);
-        doNothing().when(orderRepository).deleteById(orderEntity.getId());
+        when(orderRepository.findById(dbOrder.getId())).thenReturn(Optional.of(dbOrder));
+        doNothing().when(orderRepository).deleteById(dbOrder.getId());
 
         //WHEN
-        orderService.deleteOrder(orderEntity.getId());
+        orderService.deleteOrder(dbOrder.getId());
 
         //THEN
-        verify(orderRepository, times(1)).existsById(orderEntity.getId());
-        verify(orderRepository, times(1)).deleteById(orderEntity.getId());
+        verify(orderRepository, times(1)).findById(dbOrder.getId());
+        verify(orderRepository, times(1)).deleteById(dbOrder.getId());
         verifyNoMoreInteractions(orderRepository);
     }
 
@@ -267,7 +303,7 @@ public class OrderServiceTest {
             """)
     void shouldThrowException_whenOrderDoesNotExist() {
         //WHEN
-        when(orderRepository.existsById(ORDER_ID_1)).thenReturn(false);
+        when(orderRepository.findById(ORDER_ID_1)).thenReturn(Optional.empty());
 
         //THEN
         assertThatThrownBy(() -> orderService.deleteOrder(ORDER_ID_1))

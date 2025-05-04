@@ -6,12 +6,13 @@ spring:
 
   # Database
   datasource:
-    url: jdbc:postgresql://localhost:5432/order_manager_db
+#    url: jdbc:postgresql://localhost:5432/order_manager_db
+    url: jdbc:postgresql://db:5432/order_manager_db
     username: postgres
     password: 5555
   flyway:
     enabled: true
-    locations: classpath:db/migration, classpath:db/migration/test
+    locations: classpath:db/migration
     clean-disabled: false
 
   # Hibernate

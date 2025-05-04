@@ -21,12 +21,6 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @GetMapping
-    @Operation(summary = "Get orders for a user")
-    public List<OrderDto> getOrdersByUsername(@AuthenticationPrincipal UserDetails userDetails) {
-        return orderService.getOrdersByUsername(userDetails.getUsername());
-    }
-
     @PostMapping
     @Operation(summary = "Create a new order")
     public OrderDto createOrder(@AuthenticationPrincipal UserDetails userDetails,
@@ -34,10 +28,22 @@ public class OrderController {
         return orderService.createOrder(userDetails.getUsername(), input);
     }
 
+    @GetMapping
+    @Operation(summary = "Get orders for a user")
+    public List<OrderDto> getOrdersByUsername(@AuthenticationPrincipal UserDetails userDetails) {
+        return orderService.getOrdersByUsername(userDetails.getUsername());
+    }
+
+    @GetMapping("/{orderId}")
+    @Operation(summary = "Get order by ID")
+    public OrderDto getOrder(@PathVariable Long orderId) {
+        return orderService.getOrder(orderId);
+    }
+
     @PutMapping("/{orderId}")
     @Operation(summary = "Update status of the order by ID")
     public OrderDto updateOrderStatus(@Parameter(description = "Type ID of the order to be updated")
-                                           @PathVariable Long orderId) {
+                                      @PathVariable Long orderId) {
         return orderService.updateOrderStatus(orderId, OrderStatus.COMPLETED);
     }
 

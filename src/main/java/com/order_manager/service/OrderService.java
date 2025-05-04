@@ -1,6 +1,6 @@
 package com.order_manager.service;
 
-import com.order_manager.dto.OrderDTO;
+import com.order_manager.dto.OrderDto;
 import com.order_manager.dto.OrderInput;
 import com.order_manager.entity.DbOrder;
 import com.order_manager.entity.DbUser;
@@ -12,7 +12,7 @@ import com.order_manager.mapper.OrderMapper;
 import com.order_manager.repository.OrderRepository;
 import com.order_manager.repository.ProductRepository;
 import com.order_manager.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ public class OrderService {
         return orderDto;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<OrderDto> getOrdersByUsername(String username) {
 
         List<OrderDto> orderDto = orderRepository.findByUserName(username)
@@ -60,6 +60,25 @@ public class OrderService {
 
 
         log.info("Orders retrieved from DB");
+        return orderDto;
+    }
+
+    @Transactional(readOnly = true)
+    public OrderDto getOrder(@NonNull Long id) {
+        var cached = orderCacheService.getCachedOrder(id);
+        System.out.println(cached);
+        if (cached != null) {
+            log.info("Order with id #{} was retrieved from Redis cache", id);
+            return cached;
+        }
+
+        var dbOrder = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id #" + id + " not found"));
+
+        var orderDto = orderMapper.dbToDto(dbOrder);
+        orderCacheService.cacheOrder(orderDto);
+
+        log.info("Order with id #{} was retrieved from DB", orderDto.id());
         return orderDto;
     }
 
